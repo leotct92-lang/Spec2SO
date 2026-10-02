@@ -2,12 +2,12 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://github.com/hdl-tools/digital-chip-design-agents/blob/main/docs/design_state.schema.json",
   "title": "design_state.json",
-  "description": "Shared cross-orchestrator state for the digital RTL-to-GDSII + verification pipeline. Machine-readable companion to the prose schema in memory/README.md and plugins/meta/skills/pipeline-orchestration/SKILL.md. Validates both the fix_request and checkpoint variants of design_state.json.",
+  "description": "Shared cross-orchestrator state for Stage 0 input qualification, the digital RTL-to-GDSII + verification pipeline, and append-only revision/checker traceability. Version 2.0 is a backward-compatible superset of the 1.x fix-request and checkpoint contract.",
   "type": "object",
   "required": ["format_version"],
   "additionalProperties": true,
   "properties": {
-    "format_version": { "enum": ["1.1", "1.2", "1.3", "1.4", "1.5"] },
+    "format_version": { "enum": ["1.1", "1.2", "1.3", "1.4", "1.5", "2.0"] },
     "design_name": { "type": ["string", "null"] },
     "created_at": { "type": ["string", "null"] },
     "updated_at": { "type": ["string", "null"] },
@@ -44,6 +44,29 @@
       }
     },
     "constraints": { "type": "object", "additionalProperties": true },
+    "current_revision_id": { "type": ["string", "null"], "pattern": "^REV-[0-9]{4,}$" },
+    "input_records": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/inputRecord" }
+    },
+    "stage0_feedback_requests": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/stage0FeedbackRequest" }
+    },
+    "input_reconstruction": { "type": "object", "additionalProperties": true },
+    "revisions": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/revision" }
+    },
+    "checker_runs": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/checkerRun" }
+    },
+    "iteration_history": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/iterationRecord" }
+    },
+    "traceability_metrics": { "type": "object", "additionalProperties": true },
     "fix_requests": {
       "type": "array",
       "items": { "$ref": "#/$defs/fixRequest" }
@@ -70,6 +93,124 @@
         { "enum": ["proceed", "retry_stage", "escalate", "abandon"] },
         { "type": "string", "pattern": "^loop_back_to:" }
       ]
+    },
+    "evidenceClassification": {
+      "enum": ["OFFICIAL_DISCLOSED", "PUBLIC_CORROBORATED", "DERIVED_ESTIMATE",
+               "ENGINEERING_ASSUMPTION", "UNKNOWN"]
+    },
+    "evidenceConfidence": { "enum": ["HIGH", "MEDIUM", "LOW"] },
+    "usageClassification": {
+      "enum": ["HARD_CONSTRAINT", "SOFT_CONSTRAINT", "EXPLORATORY_ONLY"]
+    },
+    "provenance": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": ["source", "reference", "source_organization", "document_title",
+                   "page_or_section", "publication_date", "retrieval_date",
+                   "evidence_classification", "confidence", "derivation_method",
+                   "uncertainty", "lower_bound", "upper_bound", "usage_classification"],
+      "properties": {
+        "source": { "type": ["string", "null"] },
+        "reference": { "type": ["string", "null"] },
+        "source_organization": { "type": ["string", "null"] },
+        "document_title": { "type": ["string", "null"] },
+        "page_or_section": { "type": ["string", "null"] },
+        "publication_date": { "type": ["string", "null"] },
+        "retrieval_date": { "type": "string" },
+        "evidence_classification": { "$ref": "#/$defs/evidenceClassification" },
+        "confidence": { "$ref": "#/$defs/evidenceConfidence" },
+        "derivation_method": { "type": ["string", "null"] },
+        "uncertainty": { "type": ["string", "number", "null"] },
+        "lower_bound": {},
+        "upper_bound": {},
+        "usage_classification": { "$ref": "#/$defs/usageClassification" }
+      }
+    },
+    "inputRecord": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": ["input_id", "field_name", "definition", "unit", "datatype",
+                   "requirement", "consuming_stages", "current_value", "missing_status",
+                   "evidence_status", "estimation_allowed", "acceptable_range_or_form",
+                   "provenance"],
+      "properties": {
+        "input_id": { "type": "string", "pattern": "^IN-[0-9]{4,}$" },
+        "field_name": { "type": "string" },
+        "definition": { "type": "string" },
+        "unit": { "type": ["string", "null"] },
+        "datatype": { "type": "string" },
+        "requirement": { "enum": ["REQUIRED", "OPTIONAL"] },
+        "consuming_stages": { "type": "array", "minItems": 1, "items": { "type": "string" } },
+        "current_value": {},
+        "missing_status": { "enum": ["AVAILABLE", "MISSING", "WEAK", "CONTRADICTORY"] },
+        "evidence_status": { "$ref": "#/$defs/evidenceClassification" },
+        "estimation_allowed": { "type": "boolean" },
+        "acceptable_range_or_form": {},
+        "supersedes_input_id": { "type": ["string", "null"] },
+        "provenance": { "$ref": "#/$defs/provenance" }
+      }
+    },
+    "stage0FeedbackRequest": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": ["request_id", "created_at", "requesting_stage", "field_name", "reason", "status"],
+      "properties": {
+        "request_id": { "type": "string", "pattern": "^S0-[0-9]{4,}$" },
+        "requesting_stage": { "type": "string" },
+        "field_name": { "type": "string" },
+        "status": { "enum": ["OPEN", "RESOLVED", "BLOCKED"] },
+        "input_record_ids": { "type": "array", "items": { "type": "string" } },
+        "rerun_id": { "type": ["string", "null"] }
+      }
+    },
+    "revision": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": ["revision_id", "parent_revision_id", "git_commit_sha", "created_at",
+                   "created_by", "change_domain", "trigger_type", "trigger_id",
+                   "trigger_stage", "trigger_checker", "trigger_failure_class",
+                   "trigger_summary", "change_summary", "affected_files", "status"],
+      "properties": {
+        "revision_id": { "type": "string", "pattern": "^REV-[0-9]{4,}$" },
+        "parent_revision_id": { "type": ["string", "null"] },
+        "git_commit_sha": { "type": "string", "pattern": "^[0-9a-f]{40}$" },
+        "change_domain": { "type": "array", "minItems": 1, "items": { "type": "string" } },
+        "affected_files": { "type": "array", "items": { "type": "string" } },
+        "status": { "enum": ["ACTIVE", "SUPERSEDED", "FINAL"] },
+        "checker_run_ids": { "type": "array", "items": { "type": "string" } },
+        "superseded_by": { "type": ["string", "null"] },
+        "architecture_revision_id": { "type": ["string", "null"] },
+        "rtl_revision_id": { "type": ["string", "null"] }
+      }
+    },
+    "checkerRun": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": ["run_id", "revision_id", "stage", "checker", "tool_version",
+                   "command_or_config", "start_time", "end_time", "duration_seconds",
+                   "result", "failure_class", "relevant_constraint", "key_metrics",
+                   "summary", "log_path", "report_path", "fix_request_id"],
+      "properties": {
+        "run_id": { "type": "string", "pattern": "^RUN-[0-9]{4,}$" },
+        "revision_id": { "type": "string" },
+        "duration_seconds": { "type": "number", "minimum": 0 },
+        "result": { "enum": ["PASS", "FAIL", "WARN", "BLOCKED"] },
+        "failure_class": { "type": ["string", "null"] },
+        "key_metrics": { "type": "object" },
+        "fix_request_id": { "type": ["string", "null"] }
+      }
+    },
+    "iterationRecord": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": ["iteration_id", "pipeline_session_id", "input_revision_id",
+                   "failed_run_id", "fix_request_id", "output_revision_id", "rerun_id",
+                   "result", "start_time", "end_time", "duration_seconds"],
+      "properties": {
+        "iteration_id": { "type": "string", "pattern": "^ITER-[0-9]{4,}$" },
+        "duration_seconds": { "type": "number", "minimum": 0 },
+        "result": { "enum": ["PASS", "FAIL", "WARN", "BLOCKED", "ESCALATE"] }
+      }
     },
     "fixRequest": {
       "type": "object",
@@ -108,6 +249,11 @@
           "additionalProperties": true
         },
         "rtl_response": { "type": ["object", "null"] },
+        "failed_revision_id": { "type": ["string", "null"] },
+        "failed_run_id": { "type": ["string", "null"] },
+        "resolved_revision_id": { "type": ["string", "null"] },
+        "resolution_run_id": { "type": ["string", "null"] },
+        "suspected_root_cause": { "type": ["string", "null"] },
         "history": {
           "type": "array",
           "items": {

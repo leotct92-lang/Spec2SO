@@ -230,6 +230,12 @@ integration, and chip-level simulation sign-off.
 
 ---
 
+## Stage 0 and Revision Traceability
+
+Route missing IP, interface, address-map, clock/reset, safety/security, or software inputs to
+Stage 0. Record integration lint/simulation/tests against revisions. Interface or architecture
+fixes require committed revisions and complete failure/fix/rerun traceability.
+
 ## Constraint Validation
 
 See `plugins/meta/skills/pipeline-orchestration/SKILL.md` §Constraints Schema for the authoritative schema and stage-entry validation rule.

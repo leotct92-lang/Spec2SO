@@ -206,6 +206,12 @@ When used inside OpenROAD Flow Scripts (ORFS) or LibreLane, the Yosys log appear
 
 ---
 
+## Stage 0 and Revision Traceability
+
+Route missing clocks, PVT, area, power, or library inputs to Stage 0. Record synthesis, timing,
+power, area, and LEC runs against exact revisions. Synthesis-driven logical changes require a
+committed revision and complete failure/fix/rerun links.
+
 ## Constraint Validation
 
 See `plugins/meta/skills/pipeline-orchestration/SKILL.md` §Constraints Schema for the authoritative schema and stage-entry validation rule.

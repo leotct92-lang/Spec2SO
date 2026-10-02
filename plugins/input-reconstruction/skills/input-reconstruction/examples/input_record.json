@@ -1,0 +1,30 @@
+{
+  "input_id": "IN-0001",
+  "field_name": "clock.core_frequency",
+  "definition": "Target core clock frequency in the named operating mode",
+  "unit": "MHz",
+  "datatype": "number",
+  "requirement": "REQUIRED",
+  "consuming_stages": ["architecture", "rtl", "synthesis", "sta"],
+  "current_value": 1000,
+  "missing_status": "AVAILABLE",
+  "evidence_status": "QUALIFIED",
+  "estimation_allowed": true,
+  "acceptable_range_or_form": "positive number with operating mode and corner",
+  "provenance": {
+    "source": "manufacturer data sheet",
+    "reference": "https://example.invalid/product-datasheet",
+    "source_organization": "Example Manufacturer",
+    "document_title": "Example Product Data Sheet",
+    "page_or_section": "Clocking / operating points",
+    "publication_date": null,
+    "retrieval_date": "2026-01-01",
+    "evidence_classification": "OFFICIAL_DISCLOSED",
+    "confidence": "HIGH",
+    "derivation_method": "direct transcription",
+    "uncertainty": "operating-mode limited",
+    "lower_bound": 1000,
+    "upper_bound": 1000,
+    "usage_classification": "HARD_CONSTRAINT"
+  }
+}

@@ -254,6 +254,12 @@ Hold violation:
 
 ---
 
+## Stage 0 and Revision Traceability
+
+Route missing modes, clocks, exceptions, corners, libraries, RC, or margins to Stage 0. Record
+every STA/LEC run against a revision. STA-driven logical or architectural changes create new
+committed revisions and preserve failed path/run through the fixing revision and rerun.
+
 ## Constraint Validation
 
 See `plugins/meta/skills/pipeline-orchestration/SKILL.md` §Constraints Schema for the authoritative schema and stage-entry validation rule.

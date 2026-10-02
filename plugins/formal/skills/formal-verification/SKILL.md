@@ -256,6 +256,12 @@ assume property (@(posedge clk)
 
 ---
 
+## Stage 0 and Revision Traceability
+
+Route missing assumptions, clocks, resets, interfaces, or property intent to Stage 0. Record
+every proof/LEC run against an exact revision. Route DUT, property, synthesis, and architecture
+root causes to their actual owners and preserve failure → fix → revision → rerun links.
+
 ## Constraint Validation
 
 See `plugins/meta/skills/pipeline-orchestration/SKILL.md` §Constraints Schema for the authoritative schema and stage-entry validation rule.

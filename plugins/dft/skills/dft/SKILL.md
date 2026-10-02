@@ -253,6 +253,12 @@ one that needs an RTL change is handed back to the RTL flow — do not edit the 
 
 ---
 
+## Stage 0 and Revision Traceability
+
+Route missing test modes, targets, memory inventory, clocks/resets, or DFT collateral to Stage
+0. Record DRC, scan, ATPG, MBIST, and boundary-scan runs against revisions. DFT-related logical
+changes require a committed revision and rerun link.
+
 ## Constraint Validation
 
 See `plugins/meta/skills/pipeline-orchestration/SKILL.md` §Constraints Schema for the authoritative schema and stage-entry validation rule.

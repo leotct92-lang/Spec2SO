@@ -354,6 +354,12 @@ way in every simulator.
 
 ---
 
+## Stage 0 and Revision Traceability
+
+Route missing verification intent to Stage 0. Record every compile, simulation, regression,
+and coverage execution against an exact revision. A DUT failure opens a fix request containing
+the failed revision/run and later links the fixing revision and rerun.
+
 ## Constraint Validation
 
 See `plugins/meta/skills/pipeline-orchestration/SKILL.md` §Constraints Schema for the authoritative schema and stage-entry validation rule.

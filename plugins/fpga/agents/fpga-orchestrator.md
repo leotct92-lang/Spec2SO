@@ -213,6 +213,51 @@ These rules apply to every stage and take precedence over keeping the flow movin
    `resource_limit` — the cap was not reached.
 <!-- END SHARED:stage-gating -->
 
+<!-- BEGIN SHARED:stage0-traceability (synced from tools/agent_shared_sections.md - edit there, then run tools/sync_agent_sections.py) -->
+## Stage 0 Feedback and Design Traceability
+
+These rules are part of the standard Spec2SO flow, not optional project documentation.
+
+1. **Consume qualified inputs.** Before the first stage, read `input_records[]` and
+   `input_reconstruction` from `design_state.json`. A hard constraint is usable for production
+   gating only when its value-level provenance and usage classification support that use.
+   `DERIVED_ESTIMATE` and `ENGINEERING_ASSUMPTION` values may drive explicitly labeled
+   exploratory work, never production sign-off.
+2. **Route gaps to Stage 0.** When this domain finds a missing, weak, contradictory, or
+   under-qualified input, append an `OPEN` `stage0_feedback_requests[]` entry with the field,
+   requesting stage, current revision, reason, and required evidence/use level. Invoke the
+   `input-reconstruction-orchestrator`; after it resolves or blocks the request, rerun the
+   affected stage. Do not invent the upstream value and do not spend a normal domain loop-back
+   retry on an unresolved input gap.
+3. **Checkpoint every meaningful engineering state.** Before a released architecture,
+   microarchitecture, RTL, constraint, interface, clock/reset, memory, verification-relevant,
+   synthesis/timing/power/area/formal/CDC/RDC/DFT/PD/STA-driven change becomes the new baseline,
+   save the files in a Git commit and append a `revisions[]` record with a `REV-NNNN` ID, parent,
+   exact 40-character commit SHA, trigger, domains, summary, and affected files. A revision may
+   not point at an uncommitted or nonexistent Git object.
+4. **Record every checker run.** Compile, lint, simulation, verification, formal, CDC, RDC,
+   synthesis, timing, power, area, DFT, physical-design, STA, and integration executions each
+   append one immutable `checker_runs[]` record. Use `RUN-NNNN`; include revision, tool/version,
+   command/config, start/end/duration, `PASS|FAIL|WARN|BLOCKED`, failure class, constraint,
+   metrics, summary, log/report paths, and fix-request link. A missing tool is a BLOCKED run,
+   not an omitted run or a PASS.
+5. **Map failure to fix and revision.** A failed checker run names its failed revision and, when
+   actionable, opens/updates a `fix_request` with `failed_revision_id` and `failed_run_id`.
+   The fix creates a new committed revision; add `resolved_revision_id`, rerun against that new
+   revision, and add `resolution_run_id`. Never rewrite or delete the failed run/revision.
+6. **Record complete iterations.** Every loop-back appends `iteration_history[]` with
+   `ITER-NNNN`, pipeline session, input revision, failed run, fix request, output revision,
+   rerun, result, timestamps, and duration. Architecture/microarchitecture root causes route to
+   the architecture orchestrator before RTL regeneration; link the architecture revision to the
+   resulting RTL revision.
+7. **Append-only enforcement.** Use `tools/design_traceability.py` or enforce the same
+   invariants. Historical input, revision, checker, and iteration records are immutable except
+   for additive resolution links and revision status. Never reuse an ID.
+8. **Preserve the existing protocol.** These fields extend rather than replace `history[]`,
+   `fix_requests[]`, `archive_fix_requests[]`, `pipeline_session_id`,
+   `cross_domain_iteration_count`, and `pending_approval`. Existing iteration caps still apply.
+<!-- END SHARED:stage0-traceability -->
+
 <!-- BEGIN SHARED:long-running-jobs (synced from tools/agent_shared_sections.md - edit there, then run tools/sync_agent_sections.py) -->
 ## Long-Running Jobs
 Builds, simulations, and PD/formal/verification flows routinely exceed a single turn.
@@ -373,7 +418,7 @@ read-modify-write of `design_state.json`:
 2. Read the file if it exists, or start from `{}`.
 3. Set `design_name` (from your state object) if not already present.
 4. Set `created_at` (ISO-8601) if not present; set `updated_at` to now.
-5. Upgrade `format_version` to `"1.5"` if absent or currently `"1.0"`, `"1.1"`, `"1.2"`, `"1.3"`, or `"1.4"`; preserve any higher version without downgrade.
+5. Upgrade `format_version` to `"2.0"` if absent or currently `"1.0"`, `"1.1"`, `"1.2"`, `"1.3"`, `"1.4"`, or `"1.5"`; preserve any higher version without downgrade.
 6. Merge your domain fields (below) into the top-level object.
 7. Confirm the terminal `history[]` entry for the final stage was written by the per-stage trace (Behaviour Rule 7); if not yet written (abrupt termination), append it now.
 8. Write to a unique temp file (e.g., `design_state.<pid>.<uuid>.tmp`), then rename to `design_state.json` while still holding the lock.

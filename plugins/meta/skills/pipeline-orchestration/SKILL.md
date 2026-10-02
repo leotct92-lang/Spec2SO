@@ -1,11 +1,9 @@
 ---
 name: pipeline-orchestration
 description: >
-  Cross-domain loop orchestration for the chip design pipeline. Provides the
-  fix_request protocol, iteration-cap logic, escalation templates, and dispatch
-  patterns for routing verification/formal failures to the RTL orchestrator and
-  back. Use when driving the closed-loop verification↔RTL feedback cycle.
-version: 1.0.0
+  Cross-domain orchestration from Stage 0 input qualification through architecture,
+  implementation, verification, sign-off preparation, and traced multi-owner loop-backs.
+version: 2.0.0
 author: chuanseng-ng
 license: MIT
 allowed-tools: Read, Write, Bash
@@ -23,18 +21,19 @@ allowed-tools: Read, Write, Bash
 
 ## Purpose
 
-This skill provides the closed-loop verification↔RTL feedback protocol. When a DUT bug
-is found during simulation or formal verification, it must be communicated to the RTL
-orchestrator in a machine-actionable way and the pipeline must iterate until the bug is
-fixed or the iteration limit is reached.
+This skill provides the complete Stage 0-first pipeline and closed-loop repair protocol.
+Downstream input gaps return to Input Reconstruction & Evidence Qualification. Checker
+failures route to the domain that owns the root cause, create a committed revision, and rerun
+the checker until resolved or the iteration limit is reached.
 
 The protocol has three participants:
 
 | Participant | Role |
 |---|---|
 | **verification-orchestrator** / **formal-orchestrator** | Detects the bug; writes a `fix_request` entry to `design_state.fix_requests[]` with `status=open`; terminates with `decision=escalate`. |
-| **rtl-design-orchestrator** | Reads the open `fix_request`; sets `status=claimed`; fixes the RTL; sets `status=fixed` with `rtl_response`; terminates. |
-| **pipeline-orchestrator** | Detects open entries; assigns a `pipeline_session_id`; dispatches RTL then re-verification in sequence; enforces a configurable cap (default 3, via `pipeline_config.max_cross_domain_iterations`); scopes divergence checks to the current session; archives resolved entries on signoff; escalates via `pending_approval` if cap exceeded. |
+| **input-reconstruction-orchestrator** | Runs before product/system specification and resolves later input/constraint gaps with qualified evidence. |
+| **architecture / RTL / other owner** | Claims routed fixes, commits a meaningful new revision, and links it to the failure. |
+| **pipeline-orchestrator** | Detects feedback/fixes, dispatches owner then checker sequentially, records an iteration, enforces the cap, and archives resolved entries. |
 
 ## Domain Rules
 
@@ -50,7 +49,7 @@ of the enums, required fields, and the `failure_class → retry_strategy` map be
   "id": "fr_<pipeline_session_id>_<YYYYMMDD>_<HHMMSS>_<seq>",
   "created_at": "<ISO-8601>",
   "updated_at": "<ISO-8601>",
-  "created_by": "verification-orchestrator | formal-orchestrator",
+  "created_by": "<checker/orchestrator that detected the failure>",
   "failure_class": "functional | protocol | coverage_gap | formal_cex",
   "retry_strategy": "refine",
   "test_name": "<directed test or property name>",
@@ -70,6 +69,12 @@ of the enums, required fields, and the `failure_class → retry_strategy` map be
   "observed_behavior": "<observed RTL behaviour>",
   "session_id": "<pipeline_session_id or null>",
   "status": "open | claimed | fixed | abandoned",
+  "route_to": "input-reconstruction | architecture | microarchitecture | rtl-design | <owning-domain>",
+  "failed_revision_id": "REV-0004",
+  "failed_run_id": "RUN-0021",
+  "resolved_revision_id": null,
+  "resolution_run_id": null,
+  "suspected_root_cause": "<evidence-backed root-cause summary>",
   "rtl_response": null,
   "history": []
 }
@@ -82,12 +87,10 @@ of the enums, required fields, and the `failure_class → retry_strategy` map be
 > root cause of a loop that reaches the iteration cap, so producers should not claim `traced`
 > for a location they did not observe.
 
-> **Reserved field — `route_to` (optional).** The schema accepts an optional
-> `route_to` string naming the servicer domain for a fix (default: `rtl-design`).
-> It is **forward-compatible scaffolding only**: the pipeline-orchestrator
-> currently always dispatches the RTL orchestrator (`dispatch_to_producer`), so
-> producers need not set it. It exists so multi-servicer dispatch can be added
-> later without a schema migration, mirroring the analog pipeline.
+> **`route_to` (active).** The pipeline dispatches this owner. Omit only when the evidence
+> clearly identifies an RTL defect, for which `rtl-design` is the backward-compatible default.
+> Architecture/microarchitecture causes route to `architecture`; input/evidence gaps route to
+> `input-reconstruction`.
 
 `rtl_response` (populated by rtl-design-orchestrator on close):
 ```json
@@ -95,7 +98,8 @@ of the enums, required fields, and the `failure_class → retry_strategy` map be
   "fixed_at": "<ISO-8601>",
   "diff_summary": "<one-paragraph description of changes>",
   "files_changed": ["rtl/path.sv"],
-  "commit_ref": null
+  "commit_ref": "<40-character Git commit SHA>",
+  "revision_id": "REV-0005"
 }
 ```
 
@@ -118,6 +122,22 @@ of the enums, required fields, and the `failure_class → retry_strategy` map be
 - Domain orchestrators **may** set `pending_approval` only at their two gates: `type: "checkpoint"` at their own sign-off stage, and `type: "constraint_gap"` at stage-entry constraint validation. `type: "escalation"` remains the sole responsibility of the `pipeline-orchestrator`. A domain orchestrator that escalates for any other reason (loop cap exhausted, fault in an upstream artifact) records it in the terminal `history[]` entry and does not set `pending_approval`.
 - `approved_checkpoints[]` is written by the user (or by an orchestrator executing an explicit approval instruction) and read by all orchestrators.
 - All agents may append to `fix_request.history[]` but must not overwrite each other's entries.
+- Historical input, revision, checker, and iteration records are append-only. Only additive
+  resolution links and revision status/supersession fields may be added later.
+
+### Standard Stage 0 and traceability
+
+The forward sequence begins with Input Reconstruction & Evidence Qualification, then
+product/system specification, architecture evaluation, microarchitecture, RTL, verification,
+formal, synthesis, DFT, physical design, STA, SoC integration, and applicable downstream
+firmware/software/FPGA planning. Missing or weak inputs open `stage0_feedback_requests[]` and
+return to Stage 0 before the affected stage is rerun.
+
+Version 2.0 adds append-only `input_records[]`, `revisions[]`, `checker_runs[]`, and
+`iteration_history[]`. Use `tools/design_traceability.py` to enforce IDs and references. Every
+meaningful released engineering state has a recoverable Git commit; every checker run names
+the revision it evaluated; every failure links through a fix request to its fixing revision
+and rerun. Proprietary-only gaps block dependent production sign-off, not unrelated work.
 
 ### Iteration cap
 
@@ -372,10 +392,12 @@ what the user must supply to unblock the flow. For a domain orchestrator that is
 - **`"1.3"`**: `pipeline_config.checkpoints`, `approved_checkpoints[]`, `pending_approval.type/stage/agent` present; per-stage `history[]` entries (one entry per completed stage, not just one terminal entry per run).
 - **`"1.4"`**: `constraints` object present (authoritative nested schema defined in the Constraints Schema section); stage-entry constraint validation; `pending_approval.type: "constraint_gap"`.
 - **`"1.5"`**: every `history[]` entry carries `retry_strategy` (`none | regenerate | refine | escalate`), derived from `failure_class` via the mapping in the Failure Classification & Retry Strategy section; escalations include `failure_class` + actionable guidance in the `history[]` entry's `reason`, and in `pending_approval.reason` where one is set.
+- **`"2.0"`**: Stage 0 input/provenance/feedback records plus append-only engineering
+  revisions, checker runs, complete loop iterations, Git checkpoint links, and runtime metrics.
 
 All orchestrators must:
-- Upgrade to `"1.5"` if absent or currently `"1.0"`, `"1.1"`, `"1.2"`, `"1.3"`, or `"1.4"`; never downgrade.
-- All prior-version requirements are subsumed by `"1.5"` — no separate upgrades required.
+- Upgrade any 1.x state to `"2.0"`; never downgrade.
+- All prior-version requirements are subsumed by `"2.0"`; existing fields remain compatible.
 - Treat missing `fix_requests` or `cross_domain_iteration_count` as `[]` / `0`.
 - Treat missing `confidence`, `failure_class`, or `suggested_next_step` in history entries as `null` for backward compatibility.
 - Treat missing `retry_strategy` in history entries as derivable from `failure_class` via the mapping (`none` ⇒ `none`) for backward compatibility.
@@ -441,18 +463,21 @@ The user may resume a gated orchestrator by either:
 
 #### pending_approval type-awareness (pipeline-orchestrator)
 
-The `pipeline-orchestrator`'s `detect_open_fix_requests` halts on **any** non-null
-`pending_approval` (conservative — a domain checkpoint also blocks meta dispatch). It prints
+The `pipeline-orchestrator`'s `detect_feedback_or_fix_requests` interprets non-null
+`pending_approval` by type. It prints
 a type-specific message:
 - `type: "checkpoint"`: "Checkpoint `<stage>` is awaiting human approval (set by `<agent>`). Approve or skip to continue."
 - `type: "escalation"`: (existing message) "Fix-request loop escalation — review required."
-- `type: "constraint_gap"`: "Stage `<stage>` is missing required constraint(s) (set by `<agent>`). Populate `design_state.constraints` and clear `pending_approval` to continue."
+- `type: "constraint_gap"`: create an OPEN Stage 0 feedback request, clear the transient gate
+  atomically, qualify the missing value, update the normalized spec/provenance, and rerun the
+  requesting stage. Human escalation is reserved for a genuine business decision or a
+  confirmed proprietary-only dependency.
 
-#### Per-stage history trace (format_version 1.3)
+#### Per-stage history trace (format_version 1.3+)
 
 Every domain orchestrator appends one `history[]` entry after each internal stage completes
 (PASS, FAIL, WARN), not just at session end. The last entry written is the terminal entry
-read by the pipeline-orchestrator's decision table. At format_version 1.5 the entry carries a
+read by the pipeline-orchestrator's decision table. At format_version 1.5+ the entry carries a
 `retry_strategy` field derived from `failure_class` (10-field schema). This enables post-run
 audits without replaying the full conversation.
 
@@ -498,14 +523,14 @@ Spawn form for the Agent/Task tool:
 
 Always pass the `fix_request.id` in the subagent prompt so the child can locate its work item without scanning the whole array.
 
-### V2 extension points (not wired in V1)
+### Multi-owner dispatch rules
 
-- Architecture↔RTL refinement loop: `architecture.refinement_needed=true` could trigger
-  an arch re-run. The `fix_request` schema is intentionally producer-agnostic; only
-  `created_by` would need a new value (`architecture-orchestrator`).
-- Formal property-bug routing: `failure_class=formal_cex` with `suspected_owner=formal`
-  would route to the formal orchestrator instead of RTL. Not implemented in V1.
-- **LEC unmatched-points loop**: `lec_run: unmatched points` in `formal-orchestrator.md` is intentionally **not** connected to the fix_request protocol in V1. LEC failures are netlist↔RTL mismatches introduced at synthesis — the correct consumer is `synthesis-orchestrator`, not `rtl-design-orchestrator`. Deferred to V2.
+- Architecture/microarchitecture cause → architecture orchestrator, then RTL regeneration.
+- RTL functional/formal/CDC cause → RTL orchestrator.
+- Synthesis-introduced LEC mismatch → synthesis orchestrator.
+- Missing or weak input/evidence → input-reconstruction orchestrator.
+- Formal-property defect (not a DUT defect) → formal orchestrator.
+- Unknown ownership → root-cause analysis before dispatch; do not default blindly to RTL.
 
 ## QoR Metrics
 

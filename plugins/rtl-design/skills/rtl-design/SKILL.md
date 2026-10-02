@@ -383,6 +383,12 @@ only outputs are a report and a PASS or FAIL.
 
 ---
 
+## Stage 0 and Revision Traceability
+
+Consume qualified inputs and route gaps to Stage 0. Every meaningful RTL, constraint,
+interface, clock/reset, CDC/RDC, DFT-, synthesis-, or timing-driven fix requires a Git commit
+and new revision. Record all checker runs and link failed run → fix → revision → rerun.
+
 ## Constraint Validation
 
 See `plugins/meta/skills/pipeline-orchestration/SKILL.md` §Constraints Schema for the authoritative schema and stage-entry validation rule.

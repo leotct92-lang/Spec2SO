@@ -1,0 +1,11 @@
+{
+  "name": "chip-design-input-reconstruction",
+  "version": "1.0.0",
+  "description": "Stage 0 input reconstruction, public-evidence qualification, scenario analysis, and downstream constraint-gap resolution",
+  "author": { "name": "chuanseng-ng", "url": "https://github.com/chuanseng-ng" },
+  "homepage": "https://github.com/hdl-tools/digital-chip-design-agents",
+  "repository": "https://github.com/hdl-tools/digital-chip-design-agents",
+  "license": "MIT",
+  "skills": ["./skills/input-reconstruction"],
+  "agents": ["./agents/input-reconstruction-orchestrator.md"]
+}

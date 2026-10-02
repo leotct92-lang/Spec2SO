@@ -5,10 +5,18 @@
     "github": "chuanseng-ng"
   },
   "metadata": {
-    "description": "Full digital chip design pipeline — 16 plugins across 15 domains, from infrastructure setup through tape-out and firmware, with closed-loop verification↔RTL feedback.",
+    "description": "Full digital chip design pipeline — 17 plugins across 16 domains, from evidence-qualified Stage 0 inputs through tape-out and firmware, with revision-traced cross-domain feedback.",
     "version": "1.9.0"
   },
   "plugins": [
+    {
+      "name": "chip-design-input-reconstruction",
+      "description": "Stage 0 input reconstruction, evidence qualification, scenarios, consistency checks, and downstream gap resolution",
+      "source": "./plugins/input-reconstruction",
+      "strict": true,
+      "skills": ["./skills/input-reconstruction"],
+      "agents": ["./agents/input-reconstruction-orchestrator.md"]
+    },
     {
       "name": "chip-design-architecture",
       "description": "Microarchitecture exploration, PPA estimation, risk assessment, and sign-off",
@@ -131,7 +139,7 @@
     },
     {
       "name": "chip-design-meta",
-      "description": "Cross-domain pipeline orchestrator — drives closed-loop verification↔RTL feedback via design_state.json fix_requests, enforcing a 3-iteration cap with user escalation",
+      "description": "Cross-domain Stage 0-first pipeline orchestrator with multi-owner fix routing, Git revisions, checker runs, and bounded iteration history",
       "source": "./plugins/meta",
       "strict": true,
       "skills": ["./skills/pipeline-orchestration"],

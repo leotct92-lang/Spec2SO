@@ -1,0 +1,113 @@
+{
+  "format_version": "2.0",
+  "design_name": "example_traceable_block",
+  "pipeline_session_id": "ps_20261003_010000",
+  "cross_domain_iteration_count": 1,
+  "pipeline_config": { "max_cross_domain_iterations": 3, "checkpoints": [] },
+  "pending_approval": null,
+  "approved_checkpoints": [],
+  "current_revision_id": "REV-0002",
+  "input_records": [
+    {
+      "input_id": "IN-0001",
+      "field_name": "clock.clk_mhz",
+      "definition": "Target clock frequency",
+      "unit": "MHz",
+      "datatype": "number",
+      "requirement": "REQUIRED",
+      "consuming_stages": ["architecture", "rtl-design", "synthesis", "sta"],
+      "current_value": 500,
+      "missing_status": "AVAILABLE",
+      "evidence_status": "OFFICIAL_DISCLOSED",
+      "estimation_allowed": false,
+      "acceptable_range_or_form": ">0",
+      "provenance": {
+        "source": "product specification",
+        "reference": "docs/spec.md#clock",
+        "source_organization": "example",
+        "document_title": "Example Product Specification",
+        "page_or_section": "Clock",
+        "publication_date": "2026-10-01",
+        "retrieval_date": "2026-10-03",
+        "evidence_classification": "OFFICIAL_DISCLOSED",
+        "confidence": "HIGH",
+        "derivation_method": null,
+        "uncertainty": null,
+        "lower_bound": 500,
+        "upper_bound": 500,
+        "usage_classification": "HARD_CONSTRAINT"
+      }
+    }
+  ],
+  "stage0_feedback_requests": [],
+  "revisions": [
+    {
+      "revision_id": "REV-0001",
+      "parent_revision_id": null,
+      "git_commit_sha": "1111111111111111111111111111111111111111",
+      "created_at": "2026-10-03T01:00:00Z",
+      "created_by": "rtl-design-orchestrator",
+      "change_domain": ["rtl"],
+      "trigger_type": "baseline",
+      "trigger_id": null,
+      "trigger_stage": "rtl_signoff",
+      "trigger_checker": null,
+      "trigger_failure_class": "none",
+      "trigger_summary": "initial RTL",
+      "change_summary": "initial implementation",
+      "affected_files": ["rtl/top.sv"],
+      "status": "SUPERSEDED",
+      "superseded_by": "REV-0002"
+    },
+    {
+      "revision_id": "REV-0002",
+      "parent_revision_id": "REV-0001",
+      "git_commit_sha": "2222222222222222222222222222222222222222",
+      "created_at": "2026-10-03T01:03:00Z",
+      "created_by": "rtl-design-orchestrator",
+      "change_domain": ["rtl"],
+      "trigger_type": "verification_failure",
+      "trigger_id": "FR-0001",
+      "trigger_stage": "functional_verification",
+      "trigger_checker": "verification-orchestrator",
+      "trigger_failure_class": "functional",
+      "trigger_summary": "directed test failed",
+      "change_summary": "corrected response sequencing",
+      "affected_files": ["rtl/top.sv"],
+      "status": "ACTIVE"
+    }
+  ],
+  "checker_runs": [
+    {
+      "run_id": "RUN-0001", "revision_id": "REV-0001", "stage": "functional_verification",
+      "checker": "simulator", "tool_version": "1.0", "command_or_config": "run directed",
+      "start_time": "2026-10-03T01:01:00Z", "end_time": "2026-10-03T01:01:02Z",
+      "duration_seconds": 2, "result": "FAIL", "failure_class": "functional",
+      "relevant_constraint": "spec.response", "key_metrics": {"tests": 1, "failed": 1},
+      "summary": "response mismatch", "log_path": "logs/run1.log",
+      "report_path": "reports/run1.json", "fix_request_id": "FR-0001"
+    },
+    {
+      "run_id": "RUN-0002", "revision_id": "REV-0002", "stage": "functional_verification",
+      "checker": "simulator", "tool_version": "1.0", "command_or_config": "run directed",
+      "start_time": "2026-10-03T01:04:00Z", "end_time": "2026-10-03T01:04:02Z",
+      "duration_seconds": 2, "result": "PASS", "failure_class": "none",
+      "relevant_constraint": "spec.response", "key_metrics": {"tests": 1, "failed": 0},
+      "summary": "directed test passed", "log_path": "logs/run2.log",
+      "report_path": "reports/run2.json", "fix_request_id": "FR-0001"
+    }
+  ],
+  "iteration_history": [
+    {
+      "iteration_id": "ITER-0001", "pipeline_session_id": "ps_20261003_010000",
+      "input_revision_id": "REV-0001", "failed_run_id": "RUN-0001",
+      "fix_request_id": "FR-0001", "output_revision_id": "REV-0002",
+      "rerun_id": "RUN-0002", "result": "PASS",
+      "start_time": "2026-10-03T01:01:00Z", "end_time": "2026-10-03T01:04:02Z",
+      "duration_seconds": 182
+    }
+  ],
+  "fix_requests": [],
+  "archive_fix_requests": [],
+  "history": []
+}

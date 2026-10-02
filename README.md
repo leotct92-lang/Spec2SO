@@ -1,7 +1,7 @@
 # digital-chip-design-agents
 
 > Claude Code marketplace plugin — full digital chip design pipeline.  
-> 16 plugins · 17 skill files · 14 chip-design domains + infrastructure + pipeline orchestrator · closed-loop verification↔RTL feedback.
+> 17 plugins · 18 skill files · reusable Stage 0 evidence qualification · 14 chip-design domains + infrastructure + revision-traced pipeline orchestration.
 
 [![Validate](https://github.com/hdl-tools/digital-chip-design-agents/actions/workflows/validate.yml/badge.svg)](https://github.com/hdl-tools/digital-chip-design-agents/actions/workflows/validate.yml)
 
@@ -35,6 +35,7 @@ For the install script, selective marketplace install, other AI assistants
 
 | Plugin Name | Domain | Invoke When You Want To... |
 |-------------|--------|---------------------------|
+| `chip-design-input-reconstruction` | Input Reconstruction & Evidence Qualification | Discover downstream inputs, research gaps, qualify provenance, build scenarios, or resolve a constraint gap |
 | `chip-design-architecture` | Architecture Evaluation | Explore microarch candidates, estimate PPA, assess risk |
 | `chip-design-rtl` | RTL Design (SystemVerilog) | Write, lint, CDC-check, or synthesis-check RTL |
 | `chip-design-verification` | Functional Verification (UVM) | Build testbench, write tests, close coverage, run regression |
@@ -101,7 +102,7 @@ for the full schema, distilling workflow, and QoR trend examples.
 
 ```
 digital-chip-design-agents/
-├── .claude-plugin/marketplace.json   ← Marketplace registry (all 16 plugins)
+├── .claude-plugin/marketplace.json   ← Marketplace registry (all 17 plugins)
 ├── plugins/                          ← One isolated directory per plugin (skill + orchestrator)
 ├── ides/                             ← IDE-specific config files (Copilot / Gemini / OpenCode / Codex)
 ├── memory/                           ← Persistent two-tier per-domain memory (see memory/README.md)

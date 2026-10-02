@@ -300,6 +300,12 @@ Resume from step: `openlane --from <step_name> <config.json>`
 
 ---
 
+## Stage 0 and Revision Traceability
+
+Route missing PDK, LEF, RC, floorplan, package, power, thermal, or timing inputs to Stage 0.
+Record place/route, DRC/LVS, extraction, timing, power, and area runs against revisions. Missing
+production collateral blocks only sign-off; PD-driven logical changes require a new commit.
+
 ## Constraint Validation
 
 See `plugins/meta/skills/pipeline-orchestration/SKILL.md` §Constraints Schema for the authoritative schema and stage-entry validation rule.

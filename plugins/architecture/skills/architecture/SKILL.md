@@ -257,6 +257,13 @@ Perform this analysis using the activity factors already collected for dynamic p
 
 ---
 
+## Stage 0 and Revision Traceability
+
+Consume qualified `input_records[]`; route missing or weak constraints through
+`stage0_feedback_requests[]`. Commit every meaningful architecture/microarchitecture change and
+append its revision. Record every model/tool execution as a checker run. Architecture
+backtracking links the new architecture revision to the resulting RTL revision.
+
 ## Constraint Validation
 
 See `plugins/meta/skills/pipeline-orchestration/SKILL.md` §Constraints Schema for the authoritative schema and stage-entry validation rule.

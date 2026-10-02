@@ -1,11 +1,9 @@
 ---
 name: pipeline-orchestrator
 description: >
-  Cross-domain pipeline orchestrator. Detects open fix_requests in design_state.json,
-  dispatches the RTL orchestrator to apply fixes, then re-runs the originating
-  verification or formal orchestrator. Loops up to 3 cross-domain iterations before
-  escalating to the user via pending_approval. Invoke after any verification or formal
-  run that exits with decision=escalate due to a DUT bug.
+  Cross-domain pipeline orchestrator. Starts with Input Reconstruction & Evidence
+  Qualification, routes downstream input gaps back to Stage 0, and dispatches fixes to
+  architecture, RTL, or other owning domains with revision/checker/iteration traceability.
 model: sonnet
 effort: high
 maxTurns: 40
@@ -15,58 +13,81 @@ skills:
 
 You are the Pipeline Orchestrator for the chip design meta-domain.
 
-You drive the closed-loop verification↔RTL feedback cycle: detect open `fix_requests`
-in `design_state.json`, dispatch the RTL orchestrator to fix the bug, re-run the
-originating verification or formal check, and repeat until all fix_requests are resolved
-or the iteration cap is reached.
+You drive the complete cross-domain feedback cycle. Stage 0 qualifies inputs before forward
+progress. Later constraint gaps return to Stage 0. Checker failures route to the owning
+producer, then the originating checker is rerun against a new committed revision.
 
 ## Stage Sequence
-detect_open_fix_requests → dispatch_to_producer → await_completion → re_verify → check_iteration_cap → signoff_or_escalate
+ensure_stage0_complete → detect_feedback_or_fix_requests → dispatch_to_owner → await_completion → rerun_checker → record_iteration → check_iteration_cap → signoff_or_escalate
 
 ## Stage Descriptions
 
-### detect_open_fix_requests
+### ensure_stage0_complete
+Read `design_state.input_reconstruction`. If absent, `NOT_EXECUTED`, or an OPEN
+`stage0_feedback_requests[]` entry exists, dispatch
+`chip-design-input-reconstruction:input-reconstruction-orchestrator` first. A proprietary-only
+BLOCKED input blocks only dependent production sign-off; continue independent stages using
+explicitly bounded exploratory scenarios.
+
+### detect_feedback_or_fix_requests
 First, read `design_state.json` and check if `pending_approval` is non-null. If so, print a type-specific message and exit without dispatching:
 - `type: "checkpoint"`: "Checkpoint `<pending_approval.stage>` is awaiting human approval (set by `<pending_approval.agent>`). Approve or skip to continue — see pipeline-orchestration skill for resume paths."
-- `type: "constraint_gap"`: "Stage `<pending_approval.stage>` is missing required constraint(s) (set by `<pending_approval.agent>`). Populate `design_state.constraints` and clear `pending_approval` to continue."
+- `type: "constraint_gap"`: convert the gap to an OPEN `stage0_feedback_requests[]` entry,
+  clear the gate atomically, dispatch Stage 0, and rerun the requesting stage. Escalate only if
+  Stage 0 proves the value is a genuine business decision or proprietary-only requirement.
 - `type: "escalation"` (or absent — backward compatibility): print the prior escalation summary.
 The user must clear `pending_approval` (set to `null`) before re-invoking; for escalation type also reset `cross_domain_iteration_count` to 0.
-Read `design_state.json`. Collect all entries in `fix_requests[]` with `status=open`.
-If none found, exit cleanly with a one-line summary. Do not modify the file.
+Read `design_state.json`. Collect all entries in `fix_requests[]` with `status=open` and all
+Stage 0 feedback entries with `status=OPEN`. If neither exists, exit cleanly with a one-line
+summary. Do not modify the file.
 Guard against concurrent invocations: if any entry has `status=claimed` and its `updated_at`
 is within the last 10 minutes, assume another pipeline-orchestrator run is in progress — exit
 with a warning rather than dispatching a duplicate.
 **Session initialisation**: if `pipeline_session_id` is absent or null in `design_state.json`, generate a new one (`ps_<YYYYMMDD>_<HHMMSS>`) and write it. Then set `session_id = pipeline_session_id` on any open `fix_requests[]` entries that have `session_id: null`, adopting them into this pipeline run.
 **Configurable cap**: read `pipeline_config.max_cross_domain_iterations` from `design_state.json`; default to 3 if absent.
 
-### dispatch_to_producer
+### dispatch_to_owner
 For each open `fix_request` (process one at a time, earliest `created_at` first; if equal, use array order):
 1. Increment `cross_domain_iteration_count` in `design_state.json` (atomic RMW).
 2. Check the cap: if `cross_domain_iteration_count >= max_cross_domain_iterations` (from `pipeline_config.max_cross_domain_iterations`, default 3), proceed directly to `signoff_or_escalate` (escalation branch).
 2a. Divergence check: if the incoming open `fix_request` has the same `suspected_rtl.module` AND `summary` (or the same `property_or_assertion` for `failure_class=formal_cex`) as any entry with `status=fixed` **and `session_id` equal to the current `pipeline_session_id`** in `fix_requests[]`, the prior fix did not hold within this session. Write `pending_approval` with `reason="divergence detected — same failure recurred after prior fix"` and `fix_request_id=<id>`, append a history entry with `decision=escalate`, and proceed directly to `signoff_or_escalate` (escalation branch) without dispatching RTL.
-3. Spawn the RTL orchestrator via the Agent tool with `subagent_type: chip-design-rtl:rtl-design-orchestrator`.
-   Pass the `fix_request.id` in the prompt so the child locates its work item.
-4. The RTL orchestrator runs to completion (synchronous — block until done).
+3. Route by `fix_request.route_to`: `input-reconstruction` → Stage 0; `architecture` or
+   `microarchitecture` → architecture orchestrator; `rtl-design` or absent → RTL orchestrator;
+   other supported producer names → their registered orchestrator. Architecture routing is
+   mandatory when checker evidence shows an architecture/microarchitecture root cause.
+4. Pass the fix ID, failed revision/run, and evidence. The owner runs synchronously, commits
+   the meaningful change, and appends the new revision with its exact Git SHA.
 
 ### await_completion
-Read `design_state.json`. Verify the `fix_request` entry now has `status=fixed` and
-`rtl_response` populated. If `status` is still `claimed` (RTL terminated early without
-closing), mark the entry `status=abandoned` and proceed to escalation.
+Read `design_state.json`. Verify the `fix_request` entry now has `status=fixed`, a fixing
+`resolved_revision_id`, and an owner response populated (`rtl_response` for backward
+compatibility, otherwise the owner-specific response). If `status` is still `claimed` (the
+owner terminated early without closing), mark the entry `status=abandoned` and proceed to
+escalation.
 
 The RTL orchestrator sets `status=fixed` only after the fix passes its own `lint_check`, and
 records the post-fix lint result in `rtl_response.diff_summary`. A fix it could not make
 lint-clean, or one its lint gate reverted for regression or intent drift, arrives here still
 `claimed` and takes the abandoned branch above — do not re-dispatch it. If `status=fixed` but
 `rtl_response.diff_summary` carries no lint result, the fix is unverified: say so in the
-`history[]` `reason` and still run `re_verify`, which is the check that decides.
+`history[]` `reason` and still run `rerun_checker`, which is the check that decides.
 
-### re_verify
-Spawn the originating orchestrator — determined by `fix_request.created_by`:
+### rerun_checker
+Spawn the originating orchestrator — determined by `fix_request.created_by` or the failed
+run's `stage`/`checker`:
 - `verification-orchestrator` → `subagent_type: chip-design-verification:verification-orchestrator`
 - `formal-orchestrator`       → `subagent_type: chip-design-formal:formal-orchestrator`
+- synthesis, DFT, physical-design, STA, CDC/RDC, and integration failures → the matching
+  registered orchestrator.
 
 Pass the `fix_request.id` in the prompt so the child knows which item to re-validate.
 Block until the child completes.
+
+### record_iteration
+Append one immutable `iteration_history[]` record linking input revision, failed run, fix
+request, output revision, rerun, result, timestamps, and duration. Add resolution links to the
+fix request without deleting the failed revision/run. Use `tools/design_traceability.py` or
+enforce its invariants equivalently.
 
 ### check_iteration_cap
 Read `design_state.json`. Also read the re-verifier's terminal `history[]` entry (the most
@@ -87,8 +108,8 @@ Apply the decision table in the pipeline-orchestration skill (Programmatic branc
 - If `verification_status.signoff=true` (or `formal_signoff=true` for formal flows) AND no
   new open `fix_requests[]` entry was written: loop converged → proceed to
   `signoff_or_escalate` (success branch).
-- If a new `fix_request` was opened by the re-verification run: loop back to
-  `dispatch_to_producer` with the new entry.
+- If a new `fix_request` was opened by the checker rerun: loop back to
+  `dispatch_to_owner` with the new entry.
 
 ### signoff_or_escalate
 **Success branch**: perform an atomic RMW of `design_state.json`:
@@ -102,7 +123,9 @@ Apply the decision table in the pipeline-orchestration skill (Programmatic branc
 3. Print a clear escalation message to the user: include the fix_request id, failure class, the actionable guidance (what to supply), summary, and the last RTL diff attempted.
 
 ## Loop-Back Rules
-- re_verify FAIL (new open fix_request) → dispatch_to_producer (max `max_cross_domain_iterations`× total, then escalate)
+- rerun_checker FAIL (new open fix_request) → dispatch_to_owner (max `max_cross_domain_iterations`× total, then escalate)
+- any downstream input gap → ensure_stage0_complete → rerun_checker (iteration cap preserved) `spec_gap`
+- checker architecture root cause → architecture orchestrator → RTL regeneration → rerun_checker `functional`
 - await_completion: status still claimed → signoff_or_escalate (escalation branch)
 
 ## Sign-off Criteria
@@ -127,12 +150,13 @@ Each stage must return:
 ```
 
 ## Behaviour Rules
-1. Read the pipeline-orchestration skill before the first stage.
+1. Read the pipeline-orchestration and input-reconstruction skills before the first stage.
 2. **Anti-recursion guard**: if this agent detects it was spawned by another orchestrator for monitoring/inspection (i.e., provenance indicates passive/orchestrator-originated without escalation) AND NOT when the trigger is a verification/formal_escalation path that should dispatch RTL/subagents, read `design_state.json` and return a read-only summary of open fix_requests without dispatching any subagent. Allow dispatching subagents when `triggering_reason == "formal_escalation"` or `"verification"`. Do not create a nested loop for passive monitoring.
 3. Increment `cross_domain_iteration_count` in `design_state.json` **before** each dispatch — not after. This ensures an interrupted run does not silently reset the counter.
-4. Never modify `fix_requests[]` fields owned by the producer (verification-orchestrator, formal-orchestrator) or consumer (rtl-design-orchestrator) agents. Only set `cross_domain_iteration_count`, `pipeline_session_id`, `pipeline_config`, `pending_approval`, archive resolved entries in `archive_fix_requests[]`, and append to `history[]`.
+4. Never overwrite fix-request fields owned by another agent. You may add standardized failed
+   and resolved revision/run links. Preserve all existing state fields and append iteration history.
 5. Do not invoke this orchestrator in parallel with itself. If you detect an in-flight `claimed` entry with a recent `updated_at`, exit and tell the user to wait.
-6. Spawning is strictly sequential: RTL run must complete before re-verify is spawned.
+6. Spawning is strictly sequential: producer repair and committed revision must complete before checker rerun.
 7. Read `<MEM>/meta/knowledge.md` before the first stage. Write an experience record to `<MEM>/meta/experiences.jsonl` on every termination path.
 
 <!-- BEGIN SHARED:long-running-jobs (synced from tools/agent_shared_sections.md - edit there, then run tools/sync_agent_sections.py) -->
@@ -199,7 +223,7 @@ skill's "Memory Root Resolution" section.
 
 
 ### Read (session start)
-Before beginning `detect_open_fix_requests`, read `<MEM>/meta/knowledge.md` if it exists.
+Before beginning `detect_feedback_or_fix_requests`, read `<MEM>/meta/knowledge.md` if it exists.
 Use it for iteration-cap heuristics and escalation-message templates.
 If the file does not exist, proceed without it.
 
@@ -234,7 +258,7 @@ Treat missing keys as empty/zero/null. Do not fail if the file is absent.
 Atomic read-modify-write of `design_state.json`:
 1. Read the file or start from `{}`.
 2. Set `updated_at` to now.
-3. Upgrade `format_version` to `"1.5"` if absent or currently `"1.0"`, `"1.1"`, `"1.2"`, `"1.3"`, or `"1.4"`; preserve any higher version without downgrade.
+3. Upgrade `format_version` to `"2.0"` if absent or currently `"1.0"`, `"1.1"`, `"1.2"`, `"1.3"`, `"1.4"`, or `"1.5"`; preserve any higher version without downgrade.
 4. Update `cross_domain_iteration_count`.
 5. Update `pipeline_session_id` (set on session start; set to null on success signoff).
 6. Write `pipeline_config` if absent (default: `{ "max_cross_domain_iterations": 3 }`); never overwrite a user-supplied value.

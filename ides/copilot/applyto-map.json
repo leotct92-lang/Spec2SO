@@ -1,4 +1,5 @@
 {
+  "input-reconstruction": "**/spec/**,**/requirements/**,**/evidence/**,**/provenance/**,**/design_state.json",
   "architecture":  "**/arch*/**,**/*_arch*,**/*ppa*,**/*microarch*",
   "rtl-design":    "**/*.sv,**/*.v,**/*.svh,**/rtl/**",
   "verification":  "**/tb/**,**/uvm/**,**/sim/**,**/*_tb.sv,**/*_tb.v",

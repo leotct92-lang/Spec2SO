@@ -133,8 +133,9 @@ transfer across hosts.
 ## Design State
 
 `design_state.json` is a cross-orchestrator shared file written to the working directory.
-It persists spec, interfaces, constraints, and per-domain outputs across all 16 orchestrator
-boundaries. Every orchestrator reads it at session start (after `knowledge.md`) and performs
+It persists spec, interfaces, constraints, and per-domain outputs across all 17 orchestrator
+boundaries, including reusable Stage 0. Every orchestrator reads it at session start (after
+`knowledge.md`) and performs
 an atomic read-modify-write at session end (alongside `experiences.jsonl`).
 
 Key top-level fields:
@@ -142,7 +143,9 @@ Key top-level fields:
 - `interfaces` — AXI/protocol interface list (written by architecture)
 - `constraints` — shared timing, area, and power targets (written by architecture)
 - `architecture`, `rtl`, `synthesis`, `sta`, `pd`, ... — per-domain signoff state
-- `history[]` — append-only execution trace; one entry per **stage** (not per run — as of format_version 1.3), each with: `timestamp`, `agent`, `stage`, `decision` (`proceed|escalate|abandoned|await_approval`), `confidence` (`high|medium|low`), `failure_class` (see taxonomy below), `retry_strategy` (`none|regenerate|refine|escalate`, mapped from `failure_class`; format_version 1.5+), `suggested_next_step` (`proceed|loop_back_to:<stage>|retry_stage|escalate|abandon`), `reason`, `constraint_ref`
+- `history[]` — append-only execution trace; one entry per **stage** (not per run — as of format_version 1.3), each with: `timestamp`, `agent`, `stage`, `decision` (`proceed|loop_back|escalate|abandoned|await_approval`), `confidence` (`high|medium|low`), `failure_class` (see taxonomy below), `retry_strategy` (`none|regenerate|refine|escalate`, mapped from `failure_class`; format_version 1.5+), `suggested_next_step` (`proceed|loop_back_to:<stage>|retry_stage|escalate|abandon`), `reason`, `constraint_ref`
+- `input_records[]` and `stage0_feedback_requests[]` — immutable qualified inputs and downstream gap routing, with supersession rather than overwrite
+- `revisions[]`, `checker_runs[]`, and `iteration_history[]` — Git-backed engineering revisions, checker execution evidence, and complete failure-to-fix loops (format_version 2.0)
 - `fix_requests[]` — structured RTL fix requests written by verification/formal on DUT bug; consumed by RTL orchestrator and dispatched by pipeline-orchestrator (format_version 1.2+)
 - `cross_domain_iteration_count` — integer count of verification↔RTL feedback cycles driven by pipeline-orchestrator; capped at 3 before escalation
 - `pipeline_config.checkpoints` — list of stage names requiring human approval before the orchestrator may declare signoff (format_version 1.3+). Empty/absent ⇒ fully autonomous. Example: `["arch_signoff", "rtl_signoff", "signoff"]`. Written by user; never overwritten by orchestrators.
@@ -157,8 +160,11 @@ Key top-level fields:
 - `"1.3"` — `pipeline_config.checkpoints`, `approved_checkpoints[]`, `pending_approval.type/stage/agent`; per-stage history entries (one per stage, not one per run)
 - `"1.4"` — authoritative `constraints` object, stage-entry constraint validation, `pending_approval.type: "constraint_gap"`
 - `"1.5"` — every history entry carries `retry_strategy` (`none|regenerate|refine|escalate`), deterministically mapped from `failure_class`; escalations include `failure_class` + actionable guidance
+- `"2.0"` — Stage 0 input/provenance records, downstream feedback, Git-backed engineering revisions, checker runs, loop iterations, and runtime metrics; all 1.x fields remain compatible
 
-When `fix_requests[]` contains entries with `status=open`, the chip-design-meta `pipeline-orchestrator` is responsible for routing them to the RTL orchestrator for fixing, then re-running verification.
+When `fix_requests[]` contains entries with `status=open`, the chip-design-meta
+`pipeline-orchestrator` routes each request to its owning producer (Stage 0, architecture,
+RTL, or another domain), requires a committed revision, and reruns the originating checker.
 
 Atomic write protocol with multi-writer protection: acquire an exclusive lock (e.g., flock or application-level mutex) around the entire read-modify-write sequence → read `design_state.json` (or {}) and record a version/checksum → modify → write to a unique temp file (e.g., `design_state.<pid>.<uuid>.tmp`) → re-check that the version/checksum of `design_state.json` is unchanged (or retry on mismatch) → rename temp to `design_state.json` while still holding the lock → release the lock. This prevents both partial writes and lost updates from concurrent orchestrators. Apply the same pattern to `experiences.jsonl` upsert operations if multiple writers can touch it.
 

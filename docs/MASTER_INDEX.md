@@ -14,6 +14,11 @@
                      └────────────────────┬────────────────────────────────┘
                                           │
                      ┌────────────────────▼────────────────────────────────┐
+                     │  STAGE 0: INPUT RECONSTRUCTION & EVIDENCE           │
+                     │  Inventory, research, provenance, scenarios, gaps   │
+                     └────────────────────┬────────────────────────────────┘
+                                          │
+                     ┌────────────────────▼────────────────────────────────┐
                      │             PRODUCT SPECIFICATION                   │
                      └────────────────────┬────────────────────────────────┘
                                           │
@@ -80,6 +85,7 @@
 | # | Document | Description | Input | Output |
 |---|----------|-------------|-------|--------|
 | 0 | `Infrastructure_Setup_Flow.md` | EDA tool detection, wrapper deployment, MCP config | Host environment | tool-status.json, module-status.json, tool-manifest.json, wrappers, MCP snippets |
+| 0A | `Input_Reconstruction_Evidence_Qualification.md` | Stage 0 repository input discovery, active research, evidence qualification and downstream feedback | Incomplete project/spec/evidence | Qualified inventory, normalized spec, provenance, scenarios, gaps |
 | 1 | `Architecture_Evaluation_Flow.md` | Microarch exploration, PPA estimate, risk | Product spec | Microarch doc |
 | 2 | `RTL_Design_Flow.md` | SV RTL coding, lint, CDC, synth check | Microarch doc | Synthesis-ready RTL |
 | 3 | `HLS_Flow.md` | C/C++ to RTL for algorithm blocks | C source + TB | Verified RTL |
@@ -99,6 +105,11 @@ The orchestrator agent files, `plugins/<domain>/agents/*-orchestrator.md`, are a
 for each flow's stage sequence, loop-back rules, stage gating and escalation. The flow documents
 above cover architecture, shared state and skill content. They link to the agent for the rules
 and do not restate them; `tests/test_agent_contract.py` fails if one does.
+
+Every forward project flow enters reusable Stage 0 before product/system specification.
+Any later missing or weak constraint opens a Stage 0 feedback request, updates evidence
+append-only, and reruns only the affected consumer. Meaningful engineering changes are Git
+checkpoints with `REV-*` records; every checker execution is linked as a `RUN-*` record.
 
 ---
 

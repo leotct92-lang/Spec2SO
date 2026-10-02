@@ -1,8 +1,19 @@
 # Orchestrator Flows & End-to-End Pipeline
 
 This page describes how the domain orchestrators sequence their stages and how
-the 14 design domains connect into a full chip design pipeline. For the complete
+Stage 0 plus the 14 design domains connect into a full chip design pipeline. For the complete
 per-domain flow detail, see [`MASTER_INDEX.md`](MASTER_INDEX.md).
+
+The standard flow starts with **Input Reconstruction & Evidence Qualification**, then
+Product/System Specification → Architecture Evaluation → Microarchitecture → RTL →
+Verification → Formal → Synthesis → DFT → Physical Design → STA → SoC Integration →
+applicable firmware/software/FPGA planning.
+
+Any downstream missing or under-qualified input opens a Stage 0 feedback request and reruns
+the affected stage after qualification. Every meaningful state is a Git-backed `REV-NNNN`,
+every checker execution a `RUN-NNNN`, and every failure/fix/rerun loop an `ITER-NNNN`. See
+[`Input_Reconstruction_Evidence_Qualification.md`](Input_Reconstruction_Evidence_Qualification.md)
+and [`Design_Revision_Traceability.md`](Design_Revision_Traceability.md).
 
 ## Orchestrator Flows
 
@@ -27,7 +38,10 @@ The 14 design domains (+ the meta pipeline orchestrator) map to a complete chip
 design pipeline:
 
 ```
-[Specification]
+[0. Input Reconstruction & Evidence Qualification]
+      │
+      ▼
+[Product/System Specification]
       │
       ▼
 [1. Architecture Evaluation] ──► microarch doc
