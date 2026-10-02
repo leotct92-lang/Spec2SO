@@ -1,0 +1,176 @@
+{
+  "format_version": "2.0",
+  "design_name": "Renesas R-Car V4M public reconstruction",
+  "created_at": "2026-10-02T17:33:00Z",
+  "updated_at": "2026-10-02T18:48:00Z",
+  "pipeline_session_id": "ps_20261002_v4m_public",
+  "cross_domain_iteration_count": 0,
+  "pipeline_config": {
+    "max_cross_domain_iterations": 3,
+    "checkpoints": []
+  },
+  "pending_approval": null,
+  "approved_checkpoints": [],
+  "constraints": {
+    "clock": {"clk_mhz": 1000, "classification": "OFFICIAL_DISCLOSED", "scope": "public BSP CPU OPP, not product maximum"},
+    "area": {"area_um2": 260000000, "classification": "ENGINEERING_ASSUMPTION", "usage": "EXPLORATORY_ONLY"},
+    "power": {"power_mw": 25000, "classification": "ENGINEERING_ASSUMPTION", "scope": "exploratory SoC envelope only"},
+    "pvt_corners": [{"name": "exploratory_cpu_opp", "voltage_v": 0.825, "temp_c": 105, "classification": "mixed: voltage official BSP OPP; temperature assumption"}]
+  },
+  "input_reconstruction": {
+    "status": "WARN",
+    "inventory_path": "docs/v4m/V4M_REQUIRED_INPUT_INVENTORY.md",
+    "normalized_spec_path": "docs/v4m/V4M_PUBLIC_PRODUCT_SPEC.json",
+    "source_ledger_path": "docs/v4m/V4M_SOURCE_LEDGER.md",
+    "gaps_path": "docs/v4m/V4M_GAPS_AND_ASSUMPTIONS.md",
+    "last_unknown_sweep_at": "2026-10-02T18:40:00Z",
+    "scenarios": {
+      "CONSERVATIVE": {"power_w": 15, "area_mm2": 180, "process_nm_equivalent": 12, "frequency_ghz": 1.0, "voltage_v": 0.825, "memory_bandwidth_gbs": 17.1, "thermal_c": 85, "utilization_pct": 60, "timing_margin_pct": 15},
+      "NOMINAL_EXPLORATORY": {"power_w": 25, "area_mm2": 260, "process_nm_equivalent": 7, "frequency_ghz": 1.8, "voltage_v": 0.9, "memory_bandwidth_gbs": 25.6, "thermal_c": 105, "utilization_pct": 70, "timing_margin_pct": 10},
+      "AGGRESSIVE": {"power_w": 40, "area_mm2": 340, "process_nm_equivalent": 7, "frequency_ghz": 2.0, "voltage_v": 1.0, "memory_bandwidth_gbs": 34.1, "thermal_c": 125, "utilization_pct": 80, "timing_margin_pct": 5}
+    },
+    "consistency_checks": [
+      {"check": "TOPS vs accelerator topology/frequency", "result": "WARN", "disposition": "TOPS remains UNKNOWN"},
+      {"check": "compute vs memory bandwidth", "result": "WARN", "disposition": "scenario-only bandwidth"},
+      {"check": "ISP vs camera demand", "result": "WARN", "disposition": "traffic parameterized"},
+      {"check": "power/process/frequency", "result": "WARN", "disposition": "no closure claim"},
+      {"check": "area/process/IP", "result": "WARN", "disposition": "assumption envelopes only"},
+      {"check": "thermal vs power", "result": "WARN", "disposition": "ratings/model required"},
+      {"check": "clock vs interface limits", "result": "WARN", "disposition": "line rates unresolved"},
+      {"check": "channel counts vs throughput", "result": "PASS", "disposition": "counts kept distinct from rates"}
+    ],
+    "completeness_by_category": {
+      "functional": "WARN", "compute": "WARN", "performance": "WARN", "memory": "WARN",
+      "interconnect": "WARN", "interfaces": "WARN", "clock_reset": "BLOCKED",
+      "power": "BLOCKED", "area": "BLOCKED", "thermal": "BLOCKED", "physical": "BLOCKED",
+      "safety": "BLOCKED", "security": "WARN", "software": "WARN", "verification": "WARN",
+      "dft": "BLOCKED", "integration": "WARN"
+    }
+  },
+  "input_records": [
+    {
+      "input_id": "IN-0001", "field_name": "cpu.core_count", "definition": "Public application CPU instance count", "unit": "cores", "datatype": "integer", "requirement": "REQUIRED", "consuming_stages": ["architecture", "verification", "software"], "current_value": 4, "missing_status": "AVAILABLE", "evidence_status": "OFFICIAL_DISCLOSED", "estimation_allowed": false, "acceptable_range_or_form": "positive integer tied to exact SoC revision",
+      "provenance": {"source": "Renesas Linux BSP", "reference": "https://github.com/renesas-rcar/linux-bsp/blob/b03ecaf56b04744cfb4e61905fa25fd5bc820514/arch/arm64/boot/dts/renesas/r8a779h0.dtsi", "source_organization": "Renesas Electronics", "document_title": "r8a779h0.dtsi", "page_or_section": "cpus/cpu@0..cpu@300", "publication_date": "2025-02-09", "retrieval_date": "2026-10-02", "evidence_classification": "OFFICIAL_DISCLOSED", "confidence": "HIGH", "derivation_method": "counted Cortex-A76 CPU nodes", "uncertainty": "public software topology; fuse variants not characterized", "lower_bound": 4, "upper_bound": 4, "usage_classification": "HARD_CONSTRAINT"}
+    },
+    {
+      "input_id": "IN-0002", "field_name": "cpu.public_bsp_opps", "definition": "CPU operating points exposed by the inspected public BSP", "unit": "MHz@V", "datatype": "array", "requirement": "REQUIRED", "consuming_stages": ["architecture", "power", "firmware", "timing"], "current_value": [{"frequency_mhz": 500, "voltage_v": 0.825}, {"frequency_mhz": 1000, "voltage_v": 0.825}], "missing_status": "WEAK", "evidence_status": "OFFICIAL_DISCLOSED", "estimation_allowed": true, "acceptable_range_or_form": "mode-specific frequency and voltage; never inferred as maximum",
+      "provenance": {"source": "Renesas Linux BSP", "reference": "https://github.com/renesas-rcar/linux-bsp/blob/b03ecaf56b04744cfb4e61905fa25fd5bc820514/arch/arm64/boot/dts/renesas/r8a779h0.dtsi", "source_organization": "Renesas Electronics", "document_title": "r8a779h0.dtsi", "page_or_section": "cluster0_opp", "publication_date": "2025-02-09", "retrieval_date": "2026-10-02", "evidence_classification": "OFFICIAL_DISCLOSED", "confidence": "HIGH", "derivation_method": "direct transcription of OPP nodes", "uncertainty": "not proof of product maximum or rail limits", "lower_bound": {"frequency_mhz": 500, "voltage_v": 0.825}, "upper_bound": {"frequency_mhz": 1000, "voltage_v": 0.825}, "usage_classification": "SOFT_CONSTRAINT"}
+    },
+    {
+      "input_id": "IN-0003", "field_name": "cache.a76_hierarchy", "definition": "Per-core and cluster CPU cache capacities", "unit": "KiB", "datatype": "object", "requirement": "REQUIRED", "consuming_stages": ["architecture", "performance", "area"], "current_value": {"l1_i_per_core": 64, "l1_d_per_core": 64, "l2_per_core": 256, "l3_cluster": 512}, "missing_status": "AVAILABLE", "evidence_status": "OFFICIAL_DISCLOSED", "estimation_allowed": false, "acceptable_range_or_form": "capacity per named cache level and scope",
+      "provenance": {"source": "Renesas public Yocto patch citing V4M HWUM rev 0.80", "reference": "https://github.com/renesas-rcar/meta-renesas/blob/9289a2c05dbc8d6deaaff49f33d81a0110bd8228/meta-rcar-bsp/recipes-kernel/linux/linux-renesas/0001-arm64-dts-r8a779h0-Fix-CPU-cache-hierarchy-to-enable.patch", "source_organization": "Renesas Electronics", "document_title": "Fix CPU cache hierarchy to enable cacheinfo", "page_or_section": "commit message / HWUM section 5.1.1.1", "publication_date": null, "retrieval_date": "2026-10-02", "evidence_classification": "OFFICIAL_DISCLOSED", "confidence": "HIGH", "derivation_method": "direct public excerpt", "uncertainty": "does not include other SoC SRAM", "lower_bound": {"l1": 64, "l2": 256, "l3": 512}, "upper_bound": {"l1": 64, "l2": 256, "l3": 512}, "usage_classification": "HARD_CONSTRAINT"}
+    },
+    {
+      "input_id": "IN-0004", "field_name": "ai.public_instance_topology", "definition": "Software-visible accelerator instance topology", "unit": "instances", "datatype": "object", "requirement": "REQUIRED", "consuming_stages": ["architecture", "performance", "verification", "software"], "current_value": {"imp": 2, "cve": 4, "cnn": 1, "vdsp_domains": 2}, "missing_status": "AVAILABLE", "evidence_status": "OFFICIAL_DISCLOSED", "estimation_allowed": false, "acceptable_range_or_form": "count by exact block name; no throughput inference",
+      "provenance": {"source": "Renesas Linux BSP", "reference": "https://github.com/renesas-rcar/linux-bsp/blob/b03ecaf56b04744cfb4e61905fa25fd5bc820514/arch/arm64/boot/dts/renesas/r8a779h0-uio.dtsi", "source_organization": "Renesas Electronics", "document_title": "r8a779h0-uio.dtsi", "page_or_section": "IMP/CVE/CNN/VDSP UIO nodes", "publication_date": "2025-02-09", "retrieval_date": "2026-10-02", "evidence_classification": "OFFICIAL_DISCLOSED", "confidence": "HIGH", "derivation_method": "counted public nodes/domains", "uncertainty": "does not establish performance, precision, enablement or internal architecture", "lower_bound": {"imp": 2, "cve": 4, "cnn": 1, "vdsp_domains": 2}, "upper_bound": {"imp": 2, "cve": 4, "cnn": 1, "vdsp_domains": 2}, "usage_classification": "SOFT_CONSTRAINT"}
+    },
+    {
+      "input_id": "IN-0005", "field_name": "imaging.public_topology", "definition": "Public camera and imaging instance inventory", "unit": "instances", "datatype": "object", "requirement": "REQUIRED", "consuming_stages": ["architecture", "performance", "integration", "verification"], "current_value": {"csi2": 2, "vin": 16, "isp": 2, "gray_hawk_serializer_links": 8}, "missing_status": "AVAILABLE", "evidence_status": "OFFICIAL_DISCLOSED", "estimation_allowed": false, "acceptable_range_or_form": "SoC and board counts scoped separately",
+      "provenance": {"source": "Renesas Linux BSP and Gray Hawk DTS", "reference": "https://github.com/renesas-rcar/linux-bsp/tree/b03ecaf56b04744cfb4e61905fa25fd5bc820514/arch/arm64/boot/dts/renesas", "source_organization": "Renesas Electronics", "document_title": "r8a779h0.dtsi and r8a779h0-gray-hawk-common.dtsi", "page_or_section": "CSI2/VIN/ISP and camera graph nodes", "publication_date": "2025-02-09", "retrieval_date": "2026-10-02", "evidence_classification": "OFFICIAL_DISCLOSED", "confidence": "HIGH", "derivation_method": "counted named nodes and board endpoints", "uncertainty": "does not establish simultaneous pixel throughput", "lower_bound": {"csi2": 2, "vin": 16, "isp": 2, "board_links": 8}, "upper_bound": {"csi2": 2, "vin": 16, "isp": 2, "board_links": 8}, "usage_classification": "SOFT_CONSTRAINT"}
+    },
+    {
+      "input_id": "IN-0006", "field_name": "interfaces.public_counts", "definition": "Public controller/channel inventory", "unit": "instances or channels", "datatype": "object", "requirement": "OPTIONAL", "consuming_stages": ["architecture", "integration", "firmware", "verification"], "current_value": {"ethernet": 3, "can_fd_channels": 4, "pcie_controllers": 1, "emmc_interfaces": 1}, "missing_status": "WEAK", "evidence_status": "OFFICIAL_DISCLOSED", "estimation_allowed": false, "acceptable_range_or_form": "counts plus independent lane/rate/mode context",
+      "provenance": {"source": "Renesas Linux BSP and Gray Hawk DTS", "reference": "https://github.com/renesas-rcar/linux-bsp/tree/b03ecaf56b04744cfb4e61905fa25fd5bc820514/arch/arm64/boot/dts/renesas", "source_organization": "Renesas Electronics", "document_title": "R8A779H0/Gray Hawk device trees", "page_or_section": "Ethernet, CAN-FD, PCIe and SDHI nodes", "publication_date": "2025-02-09", "retrieval_date": "2026-10-02", "evidence_classification": "OFFICIAL_DISCLOSED", "confidence": "HIGH", "derivation_method": "counted controller/channel nodes", "uncertainty": "rates, lanes, pins and product limits incomplete", "lower_bound": {"ethernet": 3, "can_fd": 4, "pcie": 1, "emmc": 1}, "upper_bound": {"ethernet": 3, "can_fd": 4, "pcie": 1, "emmc": 1}, "usage_classification": "SOFT_CONSTRAINT"}
+    },
+    {
+      "input_id": "IN-0007", "field_name": "memory.gray_hawk_fitted_capacity", "definition": "Estimated fitted DRAM capacity on the Gray Hawk board", "unit": "GiB", "datatype": "number", "requirement": "OPTIONAL", "consuming_stages": ["software", "integration", "performance"], "current_value": 8.0, "missing_status": "AVAILABLE", "evidence_status": "DERIVED_ESTIMATE", "estimation_allowed": true, "acceptable_range_or_form": "board-scoped capacity, never controller maximum",
+      "provenance": {"source": "Renesas Gray Hawk DTS address ranges", "reference": "https://github.com/renesas-rcar/linux-bsp/blob/b03ecaf56b04744cfb4e61905fa25fd5bc820514/arch/arm64/boot/dts/renesas/r8a779h0-gray-hawk-common.dtsi", "source_organization": "Renesas Electronics", "document_title": "r8a779h0-gray-hawk-common.dtsi", "page_or_section": "memory nodes and secure-memory comment", "publication_date": "2025-02-09", "retrieval_date": "2026-10-02", "evidence_classification": "DERIVED_ESTIMATE", "confidence": "MEDIUM", "derivation_method": "7.875 GiB non-secure + 128 MiB secure", "uncertainty": "board population and reserved ranges; not controller capability", "lower_bound": 8.0, "upper_bound": 8.0, "usage_classification": "SOFT_CONSTRAINT"}
+    },
+    {
+      "input_id": "IN-0008", "field_name": "scenario.critical_parameters", "definition": "Three bounded sensitivity scenarios for incomplete critical inputs", "unit": "mixed, explicitly named", "datatype": "object", "requirement": "REQUIRED", "consuming_stages": ["architecture", "performance", "power", "area", "thermal", "synthesis", "physical_design", "sta"], "current_value": {"power_w": [15, 25, 40], "area_mm2": [180, 260, 340], "process_nm_equivalent": [12, 7, 7], "frequency_ghz": [1.0, 1.8, 2.0], "voltage_v": [0.825, 0.9, 1.0], "memory_bandwidth_gbs": [17.1, 25.6, 34.1], "thermal_c": [85, 105, 125], "utilization_pct": [60, 70, 80], "timing_margin_pct": [15, 10, 5]}, "missing_status": "WEAK", "evidence_status": "ENGINEERING_ASSUMPTION", "estimation_allowed": true, "acceptable_range_or_form": "CONSERVATIVE/NOMINAL_EXPLORATORY/AGGRESSIVE, never production constraints",
+      "provenance": {"source": "Spec2SO V4M engineering sensitivity model", "reference": "docs/v4m/V4M_SENSITIVITY_SCENARIOS.md", "source_organization": "Spec2SO project", "document_title": "R-Car V4M Sensitivity Scenarios", "page_or_section": "scenario table and formulas", "publication_date": "2026-10-02", "retrieval_date": "2026-10-02", "evidence_classification": "ENGINEERING_ASSUMPTION", "confidence": "LOW", "derivation_method": "bounded scenario construction; bandwidth arithmetic explicitly documented", "uncertainty": "actual product values may lie outside the envelopes", "lower_bound": {"power_w": 15, "area_mm2": 180, "process_nm": 7, "frequency_ghz": 1.0, "voltage_v": 0.825, "bandwidth_gbs": 17.1, "thermal_c": 85, "utilization_pct": 60, "timing_margin_pct": 5}, "upper_bound": {"power_w": 40, "area_mm2": 340, "process_nm": 12, "frequency_ghz": 2.0, "voltage_v": 1.0, "bandwidth_gbs": 34.1, "thermal_c": 125, "utilization_pct": 80, "timing_margin_pct": 15}, "usage_classification": "EXPLORATORY_ONLY"}
+    }
+  ],
+  "stage0_feedback_requests": [
+    {"request_id": "S0-0001", "created_at": "2026-10-02T18:46:40Z", "requesting_stage": "rtl_design", "field_name": "clock_reset.complete_intent", "reason": "Product RTL and CDC/RDC require authoritative clock/reset/power-domain intent", "status": "BLOCKED", "input_record_ids": [], "rerun_id": "RUN-0010"},
+    {"request_id": "S0-0002", "created_at": "2026-10-02T18:46:45Z", "requesting_stage": "synthesis", "field_name": "physical.pdk_views", "reason": "Production synthesis/implementation requires RTL, Liberty, LEF, memory and SDC collateral", "status": "BLOCKED", "input_record_ids": [], "rerun_id": "RUN-0011"}
+  ],
+  "current_revision_id": "REV-0002",
+  "revisions": [
+    {
+      "revision_id": "REV-0001", "parent_revision_id": null, "git_commit_sha": "f32ab22e422b45aacd664bd798daa41cd797e56b", "created_at": "2026-10-02T18:46:23Z", "created_by": "Codex", "change_domain": ["input_reconstruction", "specification"], "trigger_type": "stage0_release", "trigger_id": null, "trigger_stage": "input_reconstruction", "trigger_checker": "input-reconstruction-orchestrator", "trigger_failure_class": "spec_gap", "trigger_summary": "Incomplete public V4M input set required qualification", "change_summary": "Released public input inventory, normalized spec, source ledger, gaps, scenarios and completeness gate", "affected_files": ["docs/v4m/V4M_REQUIRED_INPUT_INVENTORY.md", "docs/v4m/V4M_PUBLIC_PRODUCT_SPEC.json", "docs/v4m/V4M_SOURCE_LEDGER.md"], "status": "SUPERSEDED", "checker_run_ids": [], "superseded_by": "REV-0002"
+    },
+    {
+      "revision_id": "REV-0002", "parent_revision_id": "REV-0001", "git_commit_sha": "3145238b53bebbc6bc0b4468722f2625766355b3", "created_at": "2026-10-02T18:46:30Z", "created_by": "Codex", "change_domain": ["architecture", "microarchitecture", "constraints", "integration_planning"], "trigger_type": "forward_pipeline", "trigger_id": null, "trigger_stage": "architecture_evaluation", "trigger_checker": "architecture-orchestrator", "trigger_failure_class": "none", "trigger_summary": "Stage 0 produced a usable public specification with bounded gaps", "change_summary": "Selected evidence-preserving black-box architecture and released RTL/downstream handoff plans", "affected_files": ["docs/v4m/V4M_ARCHITECTURE_EVALUATION.md", "docs/v4m/V4M_MICROARCHITECTURE.md", "docs/v4m/V4M_RTL_HANDOFF.md", "docs/v4m/V4M_IMPLEMENTATION_PLAN.md"], "status": "FINAL", "checker_run_ids": ["RUN-0001", "RUN-0002", "RUN-0003", "RUN-0004", "RUN-0005", "RUN-0006", "RUN-0007", "RUN-0008", "RUN-0009", "RUN-0010", "RUN-0011", "RUN-0012", "RUN-0013", "RUN-0014", "RUN-0015", "RUN-0016", "RUN-0017", "RUN-0018", "RUN-0019"]
+    }
+  ],
+  "checker_runs": [
+    {"run_id":"RUN-0001","revision_id":"REV-0002","stage":"input_reconstruction","checker":"official-source-pin-check","tool_version":"git 2.x","command_or_config":"git -C /tmp/renesas-linux rev-parse HEAD; git -C /tmp/meta-renesas rev-parse HEAD","start_time":"2026-10-02T18:47:00Z","end_time":"2026-10-02T18:47:01Z","duration_seconds":0.02,"result":"PASS","failure_class":"none","relevant_constraint":"source revisions S1-S7","key_metrics":{"linux_bsp_sha":"b03ecaf56b04744cfb4e61905fa25fd5bc820514","meta_renesas_sha":"9289a2c05dbc8d6deaaff49f33d81a0110bd8228"},"summary":"Pinned official source check matched the source ledger","log_path":null,"report_path":"docs/v4m/V4M_SOURCE_LEDGER.md","fix_request_id":null},
+    {"run_id":"RUN-0002","revision_id":"REV-0002","stage":"product_system_specification","checker":"json-and-schema-parser","tool_version":"Python 3 / jsonschema","command_or_config":"Draft202012Validator.check_schema; json.load V4M_PUBLIC_PRODUCT_SPEC.json","start_time":"2026-10-02T18:47:01Z","end_time":"2026-10-02T18:47:02Z","duration_seconds":0.08,"result":"PASS","failure_class":"none","relevant_constraint":"machine-readable syntax/schema","key_metrics":{"json_files_validated":2},"summary":"Design-state schema and normalized V4M JSON parsed successfully","log_path":null,"report_path":"docs/v4m/V4M_PUBLIC_PRODUCT_SPEC.json","fix_request_id":null},
+    {"run_id":"RUN-0003","revision_id":"REV-0002","stage":"framework_validation","checker":"pytest","tool_version":"pytest 8.4.2","command_or_config":"/workspace/.venv/bin/python -m pytest -q","start_time":"2026-10-02T18:47:10Z","end_time":"2026-10-02T18:47:14Z","duration_seconds":3.24,"result":"PASS","failure_class":"none","relevant_constraint":"repository test suite","key_metrics":{"passed":604,"skipped":4,"failed":0},"summary":"All available framework tests passed","log_path":null,"report_path":"tests/test_stage0_traceability.py","fix_request_id":null},
+    {"run_id":"RUN-0004","revision_id":"REV-0002","stage":"framework_validation","checker":"shared-section-sync","tool_version":"sync_agent_sections.py","command_or_config":"python tools/sync_agent_sections.py --check","start_time":"2026-10-02T18:47:14Z","end_time":"2026-10-02T18:47:15Z","duration_seconds":0.05,"result":"PASS","failure_class":"none","relevant_constraint":"canonical orchestrator sections","key_metrics":{"targets_in_sync":20},"summary":"All generated shared orchestrator sections are synchronized","log_path":null,"report_path":"tools/agent_shared_sections.md","fix_request_id":null},
+    {"run_id":"RUN-0005","revision_id":"REV-0002","stage":"architecture_evaluation","checker":"cross-parameter-consistency-review","tool_version":"Spec2SO Stage 0 2.0","command_or_config":"V4M_ARCHITECTURE_EVALUATION consistency matrix","start_time":"2026-10-02T18:46:30Z","end_time":"2026-10-02T18:46:31Z","duration_seconds":0.01,"result":"WARN","failure_class":"spec_gap","relevant_constraint":"performance/power/area/bandwidth consistency","key_metrics":{"checks":8,"pass":1,"warn":7},"summary":"No contradiction was promoted to fact; seven checks remain scenario-limited","log_path":null,"report_path":"docs/v4m/V4M_ARCHITECTURE_EVALUATION.md","fix_request_id":null},
+    {"run_id":"RUN-0006","revision_id":"REV-0002","stage":"rtl_design","checker":"rtl-handoff-gate","tool_version":"Spec2SO RTL gate","command_or_config":"Require authoritative behavior, interfaces, clocks/resets and implementation rights","start_time":"2026-10-02T18:47:20Z","end_time":"2026-10-02T18:47:20Z","duration_seconds":0.01,"result":"BLOCKED","failure_class":"spec_gap","relevant_constraint":"product RTL entry criteria","key_metrics":{"missing_required_groups":8},"summary":"No product RTL generated because fundamental behavior and implementation inputs are absent","log_path":null,"report_path":"docs/v4m/V4M_RTL_HANDOFF.md","fix_request_id":null},
+    {"run_id":"RUN-0007","revision_id":"REV-0002","stage":"lint","checker":"verilator/iverilog availability and input gate","tool_version":"not installed","command_or_config":"command -v verilator; command -v iverilog; require product RTL/filelist","start_time":"2026-10-02T18:47:20Z","end_time":"2026-10-02T18:47:20Z","duration_seconds":0.01,"result":"BLOCKED","failure_class":"input_setup","relevant_constraint":"RTL source/file list","key_metrics":{"rtl_present":false,"tools_present":false},"summary":"Lint not executed: product RTL/file list absent and no lint tool installed","log_path":null,"report_path":"docs/v4m/V4M_VERIFICATION_PLAN.md","fix_request_id":null},
+    {"run_id":"RUN-0008","revision_id":"REV-0002","stage":"functional_verification","checker":"simulation-and-coverage-gate","tool_version":"not installed","command_or_config":"require RTL, models, executable requirements, tests and coverage targets","start_time":"2026-10-02T18:47:20Z","end_time":"2026-10-02T18:47:20Z","duration_seconds":0.01,"result":"BLOCKED","failure_class":"input_setup","relevant_constraint":"verification plan and DUT","key_metrics":{"dut_present":false,"testbench_present":false},"summary":"Functional verification cannot execute without DUT and authoritative requirements","log_path":null,"report_path":"docs/v4m/V4M_VERIFICATION_PLAN.md","fix_request_id":null},
+    {"run_id":"RUN-0009","revision_id":"REV-0002","stage":"formal_verification","checker":"formal-input-gate","tool_version":"sby not installed","command_or_config":"command -v sby; require RTL, properties and assumptions","start_time":"2026-10-02T18:47:20Z","end_time":"2026-10-02T18:47:20Z","duration_seconds":0.01,"result":"BLOCKED","failure_class":"input_setup","relevant_constraint":"RTL/properties/assumptions","key_metrics":{"rtl_present":false,"properties_present":false,"tool_present":false},"summary":"Formal verification not executed; no DUT/property set and no formal wrapper installed","log_path":null,"report_path":"docs/v4m/V4M_VERIFICATION_PLAN.md","fix_request_id":null},
+    {"run_id":"RUN-0010","revision_id":"REV-0002","stage":"cdc_rdc","checker":"clock-reset-intent-gate","tool_version":"not installed","command_or_config":"require RTL/netlist and authoritative clock/reset/power intent","start_time":"2026-10-02T18:47:20Z","end_time":"2026-10-02T18:47:20Z","duration_seconds":0.01,"result":"BLOCKED","failure_class":"spec_gap","relevant_constraint":"clock_reset.complete_intent","key_metrics":{"clock_domains_complete":false,"reset_domains_complete":false},"summary":"Stage 0 feedback confirmed the required product intent is proprietary/unavailable","log_path":null,"report_path":"docs/v4m/V4M_VERIFICATION_PLAN.md","fix_request_id":null},
+    {"run_id":"RUN-0011","revision_id":"REV-0002","stage":"logic_synthesis","checker":"yosys-and-collateral-gate","tool_version":"yosys not installed","command_or_config":"command -v yosys; require RTL, SDC, Liberty and memory views","start_time":"2026-10-02T18:47:20Z","end_time":"2026-10-02T18:47:20Z","duration_seconds":0.01,"result":"BLOCKED","failure_class":"input_setup","relevant_constraint":"physical.pdk_views","key_metrics":{"rtl_present":false,"liberty_present":false,"sdc_present":false,"tool_present":false},"summary":"Synthesis not executed; Stage 0 confirmed required design/technology collateral is unavailable","log_path":null,"report_path":"docs/v4m/V4M_IMPLEMENTATION_PLAN.md","fix_request_id":null},
+    {"run_id":"RUN-0012","revision_id":"REV-0002","stage":"power_area_estimation","checker":"scenario-sensitivity-review","tool_version":"Spec2SO Stage 0 2.0","command_or_config":"Review 15/25/40 W and 180/260/340 mm2 envelopes","start_time":"2026-10-02T18:46:20Z","end_time":"2026-10-02T18:46:21Z","duration_seconds":0.01,"result":"WARN","failure_class":"power_area","relevant_constraint":"exploratory scenarios only","key_metrics":{"power_scenarios":3,"area_scenarios":3},"summary":"Scenario analysis completed; no measured or sign-off power/area result exists","log_path":null,"report_path":"docs/v4m/V4M_POWER_AREA_RESEARCH.md","fix_request_id":null},
+    {"run_id":"RUN-0013","revision_id":"REV-0002","stage":"dft","checker":"dft-collateral-gate","tool_version":"not installed","command_or_config":"require RTL/netlist, scan/MBIST architecture, ATPG models and targets","start_time":"2026-10-02T18:47:20Z","end_time":"2026-10-02T18:47:20Z","duration_seconds":0.01,"result":"BLOCKED","failure_class":"input_setup","relevant_constraint":"dft.requirements","key_metrics":{"netlist_present":false,"dft_collateral_present":false},"summary":"DFT execution blocked by absent design and production test collateral","log_path":null,"report_path":"docs/v4m/V4M_IMPLEMENTATION_PLAN.md","fix_request_id":null},
+    {"run_id":"RUN-0014","revision_id":"REV-0002","stage":"physical_design","checker":"openroad-and-view-gate","tool_version":"openroad/klayout not installed","command_or_config":"command -v openroad; command -v klayout; require netlist/LEF/RC/floorplan/decks","start_time":"2026-10-02T18:47:20Z","end_time":"2026-10-02T18:47:20Z","duration_seconds":0.01,"result":"BLOCKED","failure_class":"input_setup","relevant_constraint":"physical implementation collateral","key_metrics":{"netlist_present":false,"lef_present":false,"rc_tech_present":false,"tools_present":false},"summary":"Physical design not executed; product and technology inputs are unavailable","log_path":null,"report_path":"docs/v4m/V4M_IMPLEMENTATION_PLAN.md","fix_request_id":null},
+    {"run_id":"RUN-0015","revision_id":"REV-0002","stage":"sta","checker":"opensta-and-corner-gate","tool_version":"sta not installed","command_or_config":"command -v sta; require netlist, Liberty, SDC, parasitics and derates","start_time":"2026-10-02T18:47:20Z","end_time":"2026-10-02T18:47:20Z","duration_seconds":0.01,"result":"BLOCKED","failure_class":"input_setup","relevant_constraint":"timing sign-off collateral","key_metrics":{"netlist_present":false,"liberty_present":false,"sdc_present":false,"spef_present":false,"tool_present":false},"summary":"STA not executed; no implementable timing database exists","log_path":null,"report_path":"docs/v4m/V4M_IMPLEMENTATION_PLAN.md","fix_request_id":null},
+    {"run_id":"RUN-0016","revision_id":"REV-0002","stage":"soc_integration","checker":"public-integration-inventory-review","tool_version":"Spec2SO SoC integration plan","command_or_config":"Review DTS-visible blocks and exact missing product contracts","start_time":"2026-10-02T18:46:31Z","end_time":"2026-10-02T18:46:32Z","duration_seconds":0.01,"result":"WARN","failure_class":"spec_gap","relevant_constraint":"complete address/pin/clock/reset/security maps","key_metrics":{"public_interface_groups":6,"production_contract_complete":false},"summary":"Public integration inventory completed; complete hardware contract remains unavailable","log_path":null,"report_path":"docs/v4m/V4M_TRACEABILITY_MATRIX.md","fix_request_id":null},
+    {"run_id":"RUN-0017","revision_id":"REV-0002","stage":"firmware_software_planning","checker":"official-bsp-plan-review","tool_version":"Renesas meta-renesas scarthgap","command_or_config":"Review pinned Gray Hawk Yocto/Linux/ATF/OP-TEE evidence","start_time":"2026-10-02T18:46:32Z","end_time":"2026-10-02T18:46:33Z","duration_seconds":0.01,"result":"WARN","failure_class":"spec_gap","relevant_constraint":"production manuals/hardware access","key_metrics":{"official_bsp_revision_pinned":true,"board_execution_performed":false},"summary":"Reproducible software plan prepared; no target hardware execution was available","log_path":null,"report_path":"docs/v4m/V4M_FIRMWARE_SOFTWARE_FPGA_PLAN.md","fix_request_id":null},
+    {"run_id":"RUN-0018","revision_id":"REV-0002","stage":"fpga_prototyping_planning","checker":"prototype-scope-review","tool_version":"Spec2SO FPGA plan","command_or_config":"Separate host/traffic mocks from product-equivalent RTL prototype","start_time":"2026-10-02T18:46:33Z","end_time":"2026-10-02T18:46:34Z","duration_seconds":0.01,"result":"WARN","failure_class":"spec_gap","relevant_constraint":"authorized product RTL/interface contracts","key_metrics":{"planning_complete":true,"product_prototype_executable":false},"summary":"Non-product mock strategy defined; product FPGA prototype remains blocked","log_path":null,"report_path":"docs/v4m/V4M_FIRMWARE_SOFTWARE_FPGA_PLAN.md","fix_request_id":null},
+    {"run_id":"RUN-0019","revision_id":"REV-0002","stage":"framework_validation","checker":"pytest-final","tool_version":"pytest 8.4.2","command_or_config":"/workspace/.venv/bin/python -m pytest -q","start_time":"2026-10-02T18:50:00Z","end_time":"2026-10-02T18:50:04Z","duration_seconds":3.47,"result":"PASS","failure_class":"none","relevant_constraint":"final repository regression","key_metrics":{"passed":605,"skipped":4,"failed":0,"framework_commit_sha":"3d2cdcd"},"summary":"Final post-metrics-fix repository regression passed","log_path":null,"report_path":"tests/","fix_request_id":null}
+  ],
+  "fix_requests": [],
+  "archive_fix_requests": [],
+  "iteration_history": [],
+  "history": [
+    {"timestamp":"2026-10-02T18:46:23Z","agent":"input-reconstruction-orchestrator","stage":"completeness_gate","decision":"proceed","confidence":"medium","failure_class":"spec_gap","retry_strategy":"escalate","suggested_next_step":"proceed","reason":"Public architecture work may proceed; affected production stages retain exact proprietary blockers","constraint_ref":"V4M_INPUT_COMPLETENESS_REPORT"},
+    {"timestamp":"2026-10-02T18:46:30Z","agent":"architecture-orchestrator","stage":"arch_signoff","decision":"proceed","confidence":"medium","failure_class":"spec_gap","retry_strategy":"escalate","suggested_next_step":"proceed","reason":"Evidence-preserving public architecture released with black-box unknowns; no production sign-off claim","constraint_ref":"REV-0002"},
+    {"timestamp":"2026-10-02T18:47:20Z","agent":"pipeline-orchestrator","stage":"signoff_or_escalate","decision":"proceed","confidence":"high","failure_class":"none","retry_strategy":"none","suggested_next_step":"proceed","reason":"Every independent public/preparatory stage ran; dependent production stages are selectively BLOCKED with exact inputs","constraint_ref":"REV-0002"}
+  ],
+  "traceability_metrics": {
+    "total_revisions": 2,
+    "architecture_revisions": 1,
+    "rtl_revisions": 0,
+    "total_checker_runs": 19,
+    "checker_results": {"PASS": 5, "FAIL": 0, "WARN": 5, "BLOCKED": 9},
+    "failures_by_class": {},
+    "retries_per_checker": {
+      "official-source-pin-check": 0, "json-and-schema-parser": 0, "pytest": 0,
+      "shared-section-sync": 0, "cross-parameter-consistency-review": 0,
+      "rtl-handoff-gate": 0, "verilator/iverilog availability and input gate": 0,
+      "simulation-and-coverage-gate": 0, "formal-input-gate": 0,
+      "clock-reset-intent-gate": 0, "yosys-and-collateral-gate": 0,
+      "scenario-sensitivity-review": 0, "dft-collateral-gate": 0,
+      "openroad-and-view-gate": 0, "opensta-and-corner-gate": 0,
+      "public-integration-inventory-review": 0, "official-bsp-plan-review": 0,
+      "prototype-scope-review": 0, "pytest-final": 0
+    },
+    "loop_back_cycles": 0,
+    "runtime_per_checker_seconds": {
+      "official-source-pin-check": 0.02, "json-and-schema-parser": 0.08,
+      "pytest": 3.24, "shared-section-sync": 0.05,
+      "cross-parameter-consistency-review": 0.01, "rtl-handoff-gate": 0.01,
+      "verilator/iverilog availability and input gate": 0.01,
+      "simulation-and-coverage-gate": 0.01, "formal-input-gate": 0.01,
+      "clock-reset-intent-gate": 0.01, "yosys-and-collateral-gate": 0.01,
+      "scenario-sensitivity-review": 0.01, "dft-collateral-gate": 0.01,
+      "openroad-and-view-gate": 0.01, "opensta-and-corner-gate": 0.01,
+      "public-integration-inventory-review": 0.01, "official-bsp-plan-review": 0.01,
+      "prototype-scope-review": 0.01, "pytest-final": 3.47
+    },
+    "runtime_per_stage_seconds": {
+      "input_reconstruction": 0.02, "product_system_specification": 0.08,
+      "framework_validation": 6.76, "architecture_evaluation": 0.01,
+      "rtl_design": 0.01, "lint": 0.01, "functional_verification": 0.01,
+      "formal_verification": 0.01, "cdc_rdc": 0.01, "logic_synthesis": 0.01,
+      "power_area_estimation": 0.01, "dft": 0.01, "physical_design": 0.01,
+      "sta": 0.01, "soc_integration": 0.01, "firmware_software_planning": 0.01,
+      "fpga_prototyping_planning": 0.01
+    },
+    "runtime_per_iteration_seconds": {},
+    "recorded_checker_runtime_seconds": 7.0,
+    "total_pipeline_runtime_seconds": 7.0,
+    "pipeline_wall_start": "2026-10-02T17:33:00Z",
+    "pipeline_wall_end": "2026-10-02T18:48:00Z",
+    "total_pipeline_wall_runtime_seconds": 4500,
+    "average_failure_resolution_seconds": null,
+    "stages_requiring_most_retries": [],
+    "most_common_failure_classes": []
+  }
+}

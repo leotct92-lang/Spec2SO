@@ -12,3 +12,6 @@ __pycache__/
 # central memory root, not the repo). See plugins/.../memory-keeper/memory_root.py.
 memory/*/experiences.jsonl
 memory/*/run_state.md
+
+# Cross-process lock created by the repository-local traceability CLI.
+.design_state.json.lock
