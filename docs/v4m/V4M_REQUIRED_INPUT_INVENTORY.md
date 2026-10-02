@@ -43,6 +43,7 @@ source IDs resolve in `V4M_SOURCE_LEDGER.md`. Units marked `—` are categorical
 | ethernet | Controller count/rates/TSN | object | O | integration | 3 AVB controllers; exact rates UNKNOWN | WEAK | OD | no | S1/S2 |
 | can_fd | Channel count | channels/int | O | integration, firmware | 4 | NO | OD | no | S1/S2 |
 | lin | Channel count | channels/int | O | integration | UNKNOWN | YES | U | no | manual needed |
+| flexray | Channel count/capability if implemented | channels/int | O | integration, safety | UNKNOWN | YES | U | no | manual/package data needed |
 | usb | Controllers/modes/rates | object | O | integration | UNKNOWN in inspected DTS | YES | U | no | manual needed |
 | storage | eMMC/flash/NVMe | object | O | firmware | 8-bit eMMC HS200/400 board; RPC; NVMe tools | WEAK | OD | no | S1/S2/S5 |
 | clock.tree | Sources/PLLs/domains | object | R | RTL, CDC, synthesis, STA | Public module clocks only; topology UNKNOWN | YES | U | no | manual/constraints needed |

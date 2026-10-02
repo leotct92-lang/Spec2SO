@@ -12,7 +12,7 @@ is conservatively assigned to its weakest material component.
 | Performance | 1 | 0 | 0 | 3 | 5 | WARN |
 | Memory | 1 | 0 | 2 | 1 | 5 | WARN |
 | Interconnect | 1 | 1 | 0 | 0 | 3 | WARN |
-| Interfaces | 8 | 0 | 0 | 0 | 5 | WARN |
+| Interfaces | 8 | 0 | 0 | 0 | 6 | WARN |
 | Clock/reset | 1 | 0 | 0 | 2 | 3 | BLOCKED |
 | Power | 0 | 0 | 0 | 3 | 5 | BLOCKED |
 | Area | 0 | 0 | 0 | 2 | 3 | BLOCKED |
@@ -37,7 +37,7 @@ truth. Completeness states map as follows:
 ## Final unknown sweep
 
 On 2026-10-02 UTC the alternative-term sweep repeated searches across `V4M`, `R8A779H0`,
-`Gray Hawk`, `CR52`, `GSX`, `IMP`, `CVE`, `CNN`, `VDSP`, camera/CSI/VIN, OP-TEE, package,
+`Gray Hawk`, `CR52`, `GSX`, `IMP`, `CVE`, `CNN`, `VDSP`, camera/CSI/VIN, FlexRay, OP-TEE, package,
 process, die, power, thermal, TOPS, memory, safety, DFT and R-Car Gen4 terms in accessible
 official repositories. No stronger evidence was found for the unknown fields. General/product
 web endpoints remained HTTP 403, so those gaps retain their prior classification.

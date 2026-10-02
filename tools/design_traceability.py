@@ -244,6 +244,7 @@ def add_revision_resolution(
 def record_checker_run(state: dict[str, Any], run: dict[str, Any]) -> None:
     required = {
         "run_id",
+        "pipeline_session_id",
         "revision_id",
         "stage",
         "checker",

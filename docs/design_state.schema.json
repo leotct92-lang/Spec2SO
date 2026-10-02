@@ -186,12 +186,13 @@
     "checkerRun": {
       "type": "object",
       "additionalProperties": true,
-      "required": ["run_id", "revision_id", "stage", "checker", "tool_version",
+      "required": ["run_id", "pipeline_session_id", "revision_id", "stage", "checker", "tool_version",
                    "command_or_config", "start_time", "end_time", "duration_seconds",
                    "result", "failure_class", "relevant_constraint", "key_metrics",
                    "summary", "log_path", "report_path", "fix_request_id"],
       "properties": {
         "run_id": { "type": "string", "pattern": "^RUN-[0-9]{4,}$" },
+        "pipeline_session_id": { "type": ["string", "null"] },
         "revision_id": { "type": "string" },
         "duration_seconds": { "type": "number", "minimum": 0 },
         "result": { "enum": ["PASS", "FAIL", "WARN", "BLOCKED"] },

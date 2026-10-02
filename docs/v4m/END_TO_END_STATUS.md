@@ -9,7 +9,7 @@ gate ran, and each product implementation stage that needs unavailable inputs is
 
 | Stage | Status | Evidence / outcome |
 |---|---|---|
-| Input Reconstruction & Evidence Qualification | WARN | 70 fields inventoried; 25 official, 4 corroborated, 2 derived, 7 assumptions, 32 unknown. |
+| Input Reconstruction & Evidence Qualification | WARN | 71 fields inventoried; 25 official, 4 corroborated, 2 derived, 7 assumptions, 33 unknown. |
 | Product/System Specification | PASS | Normalized JSON parses; value/source ledger is pinned. |
 | Architecture Evaluation | WARN | Public heterogeneous topology evaluated; seven consistency checks remain scenario-limited. |
 | Architecture Trade-off | WARN | Evidence-preserving black-box candidate selected; inferred internal implementation rejected. |
@@ -31,12 +31,12 @@ gate ran, and each product implementation stage that needs unavailable inputs is
 
 ## Executive metrics
 
-1. Required/material inputs: 70 (51 required, 19 optional).
+1. Required/material inputs: 71 (51 required, 20 optional).
 2. `OFFICIAL_DISCLOSED`: 25.
 3. `PUBLIC_CORROBORATED`: 4.
 4. `DERIVED_ESTIMATE`: 2.
 5. `ENGINEERING_ASSUMPTION`: 7.
-6. Remaining `UNKNOWN`: 32 after the final accessible-source sweep.
+6. Remaining `UNKNOWN`: 33 after the final accessible-source sweep.
 7. Architecture revisions: 1.
 8. RTL revisions: 0; no product RTL was ethically or technically implementable.
 9. Total engineering revisions: 2.

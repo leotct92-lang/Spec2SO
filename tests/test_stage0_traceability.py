@@ -87,6 +87,7 @@ def revision(revision_id, parent, sha, domain="rtl"):
 def run(run_id, revision_id, result, fix_request_id=None, start=0, duration=2):
     return {
         "run_id": run_id,
+        "pipeline_session_id": "ps_test",
         "revision_id": revision_id,
         "stage": "functional_verification",
         "checker": "pytest-model",

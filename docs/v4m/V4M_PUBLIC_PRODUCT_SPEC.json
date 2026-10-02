@@ -26,6 +26,6 @@
     "security_software": {"arm_trusted_firmware": true, "optee": true, "mbedtls_integration": true, "production_secure_boot": null, "hsm": null, "evidence": "OFFICIAL_DISCLOSED", "sources": ["S1", "S5", "S6"]},
     "software": {"linux": true, "yocto_branch": "scarthgap", "sdk_target": "aarch64-poky-linux", "opencv_sdk": true, "evidence": "OFFICIAL_DISCLOSED", "sources": ["S3", "S5"]}
   },
-  "unknown_or_assumed": ["peak_tops", "ai_precision", "product_max_cpu_frequency", "r52_count_lockstep_frequency", "sram_total", "dram_type_channels_rate_bandwidth_ecc", "internal_interconnect", "isp_pixel_throughput", "video_codec_limits", "usb_and_lin_inventory", "pll_dvfs_tables", "soc_power", "subsystem_power", "tdp", "thermal_limits", "process_foundry", "die_dimensions_area", "package_dimensions", "safety_certification_scope", "secure_boot_hsm_root_of_trust", "autosar_hypervisor_products", "production_physical_timing_dft_verification_constraints"],
+  "unknown_or_assumed": ["peak_tops", "ai_precision", "product_max_cpu_frequency", "r52_count_lockstep_frequency", "sram_total", "dram_type_channels_rate_bandwidth_ecc", "internal_interconnect", "isp_pixel_throughput", "video_codec_limits", "usb_lin_flexray_inventory", "pll_dvfs_tables", "soc_power", "subsystem_power", "tdp", "thermal_limits", "process_foundry", "die_dimensions_area", "package_dimensions", "safety_certification_scope", "secure_boot_hsm_root_of_trust", "autosar_hypervisor_products", "production_physical_timing_dft_verification_constraints"],
   "source_ledger": "V4M_SOURCE_LEDGER.md"
 }

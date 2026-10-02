@@ -31,7 +31,7 @@ board implementation, public software exposure, estimates, and unknown proprieta
 
 Peak TOPS and precision, product-maximum CPU/R52/GPU/accelerator clocks, SRAM totals, DRAM
 type/channels/rate/controller maximum, ECC topology, internal interconnect widths/QoS, ISP
-pixel/s, video codecs/rates, USB/LIN counts, PLL/DVFS tables, SoC/subsystem/idle/peak/TDP power,
+pixel/s, video codecs/rates, USB/LIN/FlexRay counts, PLL/DVFS tables, SoC/subsystem/idle/peak/TDP power,
 process/foundry, die dimensions/area, package/orderable-part dimensions, safety certification
 scope/ASIL allocation/diagnostics, production secure boot/HSM/roots, AUTOSAR/hypervisor product
 support, and all production physical/timing/DFT/verification constraints remain assumptions or

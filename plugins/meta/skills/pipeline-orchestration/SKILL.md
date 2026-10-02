@@ -136,7 +136,7 @@ return to Stage 0 before the affected stage is rerun.
 Version 2.0 adds append-only `input_records[]`, `revisions[]`, `checker_runs[]`, and
 `iteration_history[]`. Use `tools/design_traceability.py` to enforce IDs and references. Every
 meaningful released engineering state has a recoverable Git commit; every checker run names
-the revision it evaluated; every failure links through a fix request to its fixing revision
+the pipeline session and revision it evaluated; every failure links through a fix request to its fixing revision
 and rerun. Proprietary-only gaps block dependent production sign-off, not unrelated work.
 
 ### Iteration cap

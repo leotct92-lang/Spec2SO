@@ -3,7 +3,7 @@
 Design-state version 2.0 preserves all compatible 1.x fields and adds:
 
 - `revisions[]`: Git-backed meaningful engineering states (`REV-NNNN`).
-- `checker_runs[]`: immutable tool/checker executions (`RUN-NNNN`) tied to revisions.
+- `checker_runs[]`: immutable tool/checker executions (`RUN-NNNN`) tied to revisions and pipeline sessions.
 - `iteration_history[]`: complete failure/fix/rerun cycles (`ITER-NNNN`).
 - `input_records[]` and `stage0_feedback_requests[]`: evidence and feedback.
 

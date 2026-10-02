@@ -241,8 +241,8 @@ These rules are part of the standard Spec2SO flow, not optional project document
    not point at an uncommitted or nonexistent Git object.
 4. **Record every checker run.** Compile, lint, simulation, verification, formal, CDC, RDC,
    synthesis, timing, power, area, DFT, physical-design, STA, and integration executions each
-   append one immutable `checker_runs[]` record. Use `RUN-NNNN`; include revision, tool/version,
-   command/config, start/end/duration, `PASS|FAIL|WARN|BLOCKED`, failure class, constraint,
+   append one immutable `checker_runs[]` record. Use `RUN-NNNN`; include pipeline session,
+   revision, tool/version, command/config, start/end/duration, `PASS|FAIL|WARN|BLOCKED`, failure class, constraint,
    metrics, summary, log/report paths, and fix-request link. A missing tool is a BLOCKED run,
    not an omitted run or a PASS.
 5. **Map failure to fix and revision.** A failed checker run names its failed revision and, when

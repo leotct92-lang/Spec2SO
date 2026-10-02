@@ -10,6 +10,8 @@ Updated: 2026-10-02 UTC
 | Latest verified repository commit | `dffaa4205890ae5a7cb77e8315bf7f3dacd5c449` (605 tests passed, 4 skipped; schema/plugin/package gates passed) |
 | Current/final engineering revision | REV-0002 at `3145238b53bebbc6bc0b4468722f2625766355b3` |
 | Design state | `design_state.json`, format 2.0 |
+| Latest checker run | RUN-0020 (`repository-release-gates`, PASS) |
+| Pipeline session | `ps_20261002_v4m_public` |
 | Pipeline result | WARN overall; public/preparatory flow complete, dependent production gates selectively BLOCKED |
 
 ## Completed
@@ -17,7 +19,7 @@ Updated: 2026-10-02 UTC
 - Reusable Stage 0 plugin, agent, skill, schemas, templates and feedback routing.
 - Git-backed revision, checker-run, fix/failure and iteration traceability with metrics.
 - Compatibility with existing history, fix requests, archive, session, cap and approval fields.
-- V4M 70-field inventory, normalized public specification, provenance, gaps, scenarios,
+- V4M 71-field inventory, normalized public specification, provenance, gaps, scenarios,
   consistency checks, completeness gate and final unknown sweep.
 - Architecture evaluation/trade-off, black-box microarchitecture, RTL handoff, verification,
   implementation, integration, firmware/software and FPGA planning.

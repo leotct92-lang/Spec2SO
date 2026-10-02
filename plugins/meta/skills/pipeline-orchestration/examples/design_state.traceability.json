@@ -79,7 +79,7 @@
   ],
   "checker_runs": [
     {
-      "run_id": "RUN-0001", "revision_id": "REV-0001", "stage": "functional_verification",
+      "run_id": "RUN-0001", "pipeline_session_id": "ps_example", "revision_id": "REV-0001", "stage": "functional_verification",
       "checker": "simulator", "tool_version": "1.0", "command_or_config": "run directed",
       "start_time": "2026-10-03T01:01:00Z", "end_time": "2026-10-03T01:01:02Z",
       "duration_seconds": 2, "result": "FAIL", "failure_class": "functional",
@@ -88,7 +88,7 @@
       "report_path": "reports/run1.json", "fix_request_id": "FR-0001"
     },
     {
-      "run_id": "RUN-0002", "revision_id": "REV-0002", "stage": "functional_verification",
+      "run_id": "RUN-0002", "pipeline_session_id": "ps_example", "revision_id": "REV-0002", "stage": "functional_verification",
       "checker": "simulator", "tool_version": "1.0", "command_or_config": "run directed",
       "start_time": "2026-10-03T01:04:00Z", "end_time": "2026-10-03T01:04:02Z",
       "duration_seconds": 2, "result": "PASS", "failure_class": "none",
