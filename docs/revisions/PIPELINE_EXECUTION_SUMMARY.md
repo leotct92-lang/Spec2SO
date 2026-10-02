@@ -4,23 +4,23 @@
 
 | Metric | Value |
 |---|---:|
-| Engineering revisions | 2 |
+| Engineering revisions | 3 |
 | Architecture revisions | 1 |
 | RTL revisions | 0 |
-| Checker runs | 20 |
-| PASS / FAIL / WARN / BLOCKED | 6 / 0 / 5 / 9 |
+| Checker runs | 21 |
+| PASS / FAIL / WARN / BLOCKED | 7 / 0 / 5 / 9 |
 | Failure-resolution iterations | 0 |
 | Cross-domain cap | 3 |
 | Cap consumed | 0 |
-| Recorded checker runtime | 10.64 s |
-| Pipeline wall window | 2026-10-02 17:33:00–18:56:38 UTC (5,018 s) |
+| Recorded checker runtime | 14.12 s |
+| Pipeline wall window | 2026-10-02 17:33:00–19:00:23 UTC (5,243 s) |
 
 ## Runtime by recorded stage
 
 | Stage | Seconds |
 |---|---:|
 | Framework validation | 6.76 |
-| Final repository release gates | 3.64 |
+| Final repository release gates | 7.12 |
 | Product/system specification validation | 0.08 |
 | Input reconstruction source check | 0.02 |
 | Architecture evaluation | 0.01 |

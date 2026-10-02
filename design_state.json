@@ -2,7 +2,7 @@
   "format_version": "2.0",
   "design_name": "Renesas R-Car V4M public reconstruction",
   "created_at": "2026-10-02T17:33:00Z",
-  "updated_at": "2026-10-02T18:56:38Z",
+  "updated_at": "2026-10-02T19:00:23Z",
   "pipeline_session_id": "ps_20261002_v4m_public",
   "cross_domain_iteration_count": 0,
   "pipeline_config": {
@@ -79,19 +79,27 @@
     {
       "input_id": "IN-0008", "field_name": "scenario.critical_parameters", "definition": "Three bounded sensitivity scenarios for incomplete critical inputs", "unit": "mixed, explicitly named", "datatype": "object", "requirement": "REQUIRED", "consuming_stages": ["architecture", "performance", "power", "area", "thermal", "synthesis", "physical_design", "sta"], "current_value": {"power_w": [15, 25, 40], "area_mm2": [180, 260, 340], "process_nm_equivalent": [12, 7, 7], "frequency_ghz": [1.0, 1.8, 2.0], "voltage_v": [0.825, 0.9, 1.0], "memory_bandwidth_gbs": [17.1, 25.6, 34.1], "thermal_c": [85, 105, 125], "utilization_pct": [60, 70, 80], "timing_margin_pct": [15, 10, 5]}, "missing_status": "WEAK", "evidence_status": "ENGINEERING_ASSUMPTION", "estimation_allowed": true, "acceptable_range_or_form": "CONSERVATIVE/NOMINAL_EXPLORATORY/AGGRESSIVE, never production constraints",
       "provenance": {"source": "Spec2SO V4M engineering sensitivity model", "reference": "docs/v4m/V4M_SENSITIVITY_SCENARIOS.md", "source_organization": "Spec2SO project", "document_title": "R-Car V4M Sensitivity Scenarios", "page_or_section": "scenario table and formulas", "publication_date": "2026-10-02", "retrieval_date": "2026-10-02", "evidence_classification": "ENGINEERING_ASSUMPTION", "confidence": "LOW", "derivation_method": "bounded scenario construction; bandwidth arithmetic explicitly documented", "uncertainty": "actual product values may lie outside the envelopes", "lower_bound": {"power_w": 15, "area_mm2": 180, "process_nm": 7, "frequency_ghz": 1.0, "voltage_v": 0.825, "bandwidth_gbs": 17.1, "thermal_c": 85, "utilization_pct": 60, "timing_margin_pct": 5}, "upper_bound": {"power_w": 40, "area_mm2": 340, "process_nm": 12, "frequency_ghz": 2.0, "voltage_v": 1.0, "bandwidth_gbs": 34.1, "thermal_c": 125, "utilization_pct": 80, "timing_margin_pct": 15}, "usage_classification": "EXPLORATORY_ONLY"}
+    },
+    {
+      "input_id": "IN-0009", "field_name": "interfaces.flexray", "definition": "FlexRay controller/channel capability if implemented", "unit": "channels", "datatype": "integer_or_unknown", "requirement": "OPTIONAL", "consuming_stages": ["soc_integration", "safety", "firmware"], "current_value": null, "missing_status": "MISSING", "evidence_status": "UNKNOWN", "estimation_allowed": false, "acceptable_range_or_form": "official controller count, channel/rate, pin/package and safety scope",
+      "provenance": {"source": "final accessible-source sweep", "reference": "docs/v4m/V4M_SOURCE_LEDGER.md", "source_organization": null, "document_title": "R-Car V4M source ledger", "page_or_section": "search paths and unknown sweep", "publication_date": null, "retrieval_date": "2026-10-02", "evidence_classification": "UNKNOWN", "confidence": "LOW", "derivation_method": "searched accessible official V4M/R8A779H0 BSP and Yocto material; no qualifying capability record found", "uncertainty": "absence from inspected public software is not proof of silicon absence", "lower_bound": null, "upper_bound": null, "usage_classification": "EXPLORATORY_ONLY"}
     }
   ],
   "stage0_feedback_requests": [
     {"request_id": "S0-0001", "created_at": "2026-10-02T18:46:40Z", "requesting_stage": "rtl_design", "field_name": "clock_reset.complete_intent", "reason": "Product RTL and CDC/RDC require authoritative clock/reset/power-domain intent", "status": "BLOCKED", "input_record_ids": [], "rerun_id": "RUN-0010"},
-    {"request_id": "S0-0002", "created_at": "2026-10-02T18:46:45Z", "requesting_stage": "synthesis", "field_name": "physical.pdk_views", "reason": "Production synthesis/implementation requires RTL, Liberty, LEF, memory and SDC collateral", "status": "BLOCKED", "input_record_ids": [], "rerun_id": "RUN-0011"}
+    {"request_id": "S0-0002", "created_at": "2026-10-02T18:46:45Z", "requesting_stage": "synthesis", "field_name": "physical.pdk_views", "reason": "Production synthesis/implementation requires RTL, Liberty, LEF, memory and SDC collateral", "status": "BLOCKED", "input_record_ids": [], "rerun_id": "RUN-0011"},
+    {"request_id": "S0-0003", "created_at": "2026-10-02T18:59:00Z", "requesting_stage": "input_inventory_review", "field_name": "interfaces.flexray", "reason": "Canonical restart requirements identified an omitted optional interface field", "status": "RESOLVED", "input_record_ids": ["IN-0009"], "rerun_id": "RUN-0021"}
   ],
-  "current_revision_id": "REV-0002",
+  "current_revision_id": "REV-0003",
   "revisions": [
     {
       "revision_id": "REV-0001", "parent_revision_id": null, "git_commit_sha": "f32ab22e422b45aacd664bd798daa41cd797e56b", "created_at": "2026-10-02T18:46:23Z", "created_by": "Codex", "change_domain": ["input_reconstruction", "specification"], "trigger_type": "stage0_release", "trigger_id": null, "trigger_stage": "input_reconstruction", "trigger_checker": "input-reconstruction-orchestrator", "trigger_failure_class": "spec_gap", "trigger_summary": "Incomplete public V4M input set required qualification", "change_summary": "Released public input inventory, normalized spec, source ledger, gaps, scenarios and completeness gate", "affected_files": ["docs/v4m/V4M_REQUIRED_INPUT_INVENTORY.md", "docs/v4m/V4M_PUBLIC_PRODUCT_SPEC.json", "docs/v4m/V4M_SOURCE_LEDGER.md"], "status": "SUPERSEDED", "checker_run_ids": [], "superseded_by": "REV-0002"
     },
     {
-      "revision_id": "REV-0002", "parent_revision_id": "REV-0001", "git_commit_sha": "3145238b53bebbc6bc0b4468722f2625766355b3", "created_at": "2026-10-02T18:46:30Z", "created_by": "Codex", "change_domain": ["architecture", "microarchitecture", "constraints", "integration_planning"], "trigger_type": "forward_pipeline", "trigger_id": null, "trigger_stage": "architecture_evaluation", "trigger_checker": "architecture-orchestrator", "trigger_failure_class": "none", "trigger_summary": "Stage 0 produced a usable public specification with bounded gaps", "change_summary": "Selected evidence-preserving black-box architecture and released RTL/downstream handoff plans", "affected_files": ["docs/v4m/V4M_ARCHITECTURE_EVALUATION.md", "docs/v4m/V4M_MICROARCHITECTURE.md", "docs/v4m/V4M_RTL_HANDOFF.md", "docs/v4m/V4M_IMPLEMENTATION_PLAN.md"], "status": "FINAL", "checker_run_ids": ["RUN-0001", "RUN-0002", "RUN-0003", "RUN-0004", "RUN-0005", "RUN-0006", "RUN-0007", "RUN-0008", "RUN-0009", "RUN-0010", "RUN-0011", "RUN-0012", "RUN-0013", "RUN-0014", "RUN-0015", "RUN-0016", "RUN-0017", "RUN-0018", "RUN-0019", "RUN-0020"]
+      "revision_id": "REV-0002", "parent_revision_id": "REV-0001", "git_commit_sha": "3145238b53bebbc6bc0b4468722f2625766355b3", "created_at": "2026-10-02T18:46:30Z", "created_by": "Codex", "change_domain": ["architecture", "microarchitecture", "constraints", "integration_planning"], "trigger_type": "forward_pipeline", "trigger_id": null, "trigger_stage": "architecture_evaluation", "trigger_checker": "architecture-orchestrator", "trigger_failure_class": "none", "trigger_summary": "Stage 0 produced a usable public specification with bounded gaps", "change_summary": "Selected evidence-preserving black-box architecture and released RTL/downstream handoff plans", "affected_files": ["docs/v4m/V4M_ARCHITECTURE_EVALUATION.md", "docs/v4m/V4M_MICROARCHITECTURE.md", "docs/v4m/V4M_RTL_HANDOFF.md", "docs/v4m/V4M_IMPLEMENTATION_PLAN.md"], "status": "SUPERSEDED", "checker_run_ids": ["RUN-0001", "RUN-0002", "RUN-0003", "RUN-0004", "RUN-0005", "RUN-0006", "RUN-0007", "RUN-0008", "RUN-0009", "RUN-0010", "RUN-0011", "RUN-0012", "RUN-0013", "RUN-0014", "RUN-0015", "RUN-0016", "RUN-0017", "RUN-0018", "RUN-0019", "RUN-0020"], "superseded_by": "REV-0003"
+    },
+    {
+      "revision_id": "REV-0003", "parent_revision_id": "REV-0002", "git_commit_sha": "2704b18dd7feda968af5cd89a9ee63c585855f94", "created_at": "2026-10-02T19:00:11Z", "created_by": "Codex", "change_domain": ["input_reconstruction", "specification"], "trigger_type": "canonical_inventory_correction", "trigger_id": "S0-0003", "trigger_stage": "input_reconstruction", "trigger_checker": "input-reconstruction-orchestrator", "trigger_failure_class": "spec_gap", "trigger_summary": "Canonical handoff identified FlexRay as an applicable inventory field and pipeline sessions as checker-run provenance", "change_summary": "Added qualified UNKNOWN FlexRay input and required pipeline-session linkage on checker records", "affected_files": ["docs/v4m/V4M_REQUIRED_INPUT_INVENTORY.md", "docs/v4m/V4M_PUBLIC_PRODUCT_SPEC.json", "docs/design_state.schema.json", "tools/design_traceability.py"], "status": "FINAL", "checker_run_ids": ["RUN-0021"]
     }
   ],
   "checker_runs": [
@@ -114,7 +122,8 @@
     {"run_id":"RUN-0017","pipeline_session_id":"ps_20261002_v4m_public","revision_id":"REV-0002","stage":"firmware_software_planning","checker":"official-bsp-plan-review","tool_version":"Renesas meta-renesas scarthgap","command_or_config":"Review pinned Gray Hawk Yocto/Linux/ATF/OP-TEE evidence","start_time":"2026-10-02T18:46:32Z","end_time":"2026-10-02T18:46:33Z","duration_seconds":0.01,"result":"WARN","failure_class":"spec_gap","relevant_constraint":"production manuals/hardware access","key_metrics":{"official_bsp_revision_pinned":true,"board_execution_performed":false},"summary":"Reproducible software plan prepared; no target hardware execution was available","log_path":null,"report_path":"docs/v4m/V4M_FIRMWARE_SOFTWARE_FPGA_PLAN.md","fix_request_id":null},
     {"run_id":"RUN-0018","pipeline_session_id":"ps_20261002_v4m_public","revision_id":"REV-0002","stage":"fpga_prototyping_planning","checker":"prototype-scope-review","tool_version":"Spec2SO FPGA plan","command_or_config":"Separate host/traffic mocks from product-equivalent RTL prototype","start_time":"2026-10-02T18:46:33Z","end_time":"2026-10-02T18:46:34Z","duration_seconds":0.01,"result":"WARN","failure_class":"spec_gap","relevant_constraint":"authorized product RTL/interface contracts","key_metrics":{"planning_complete":true,"product_prototype_executable":false},"summary":"Non-product mock strategy defined; product FPGA prototype remains blocked","log_path":null,"report_path":"docs/v4m/V4M_FIRMWARE_SOFTWARE_FPGA_PLAN.md","fix_request_id":null},
     {"run_id":"RUN-0019","pipeline_session_id":"ps_20261002_v4m_public","revision_id":"REV-0002","stage":"framework_validation","checker":"pytest-final","tool_version":"pytest 8.4.2","command_or_config":"/workspace/.venv/bin/python -m pytest -q","start_time":"2026-10-02T18:50:00Z","end_time":"2026-10-02T18:50:04Z","duration_seconds":3.47,"result":"PASS","failure_class":"none","relevant_constraint":"final repository regression","key_metrics":{"passed":605,"skipped":4,"failed":0,"framework_commit_sha":"3d2cdcd"},"summary":"Final post-metrics-fix repository regression passed","log_path":null,"report_path":"tests/","fix_request_id":null},
-    {"run_id":"RUN-0020","pipeline_session_id":"ps_20261002_v4m_public","revision_id":"REV-0002","stage":"final_validation","checker":"repository-release-gates","tool_version":"pytest 8.4.2 / npm 1.9.0 package","command_or_config":"pytest; shared-section sync; JSON Schema fixtures; 17 plugin/IDE registrations; npm pack --dry-run","start_time":"2026-10-02T18:56:30Z","end_time":"2026-10-02T18:56:38Z","duration_seconds":3.64,"result":"PASS","failure_class":"none","relevant_constraint":"final committed repository state dffaa4205890ae5a7cb77e8315bf7f3dacd5c449","key_metrics":{"pytest_passed":605,"pytest_skipped":4,"sync_targets":20,"state_fixtures":5,"plugins":17,"ide_domains":17,"npm_pack":"PASS"},"summary":"All final repository release gates passed against committed report/state content","log_path":null,"report_path":"docs/PROJECT_STATUS.md","fix_request_id":null}
+    {"run_id":"RUN-0020","pipeline_session_id":"ps_20261002_v4m_public","revision_id":"REV-0002","stage":"final_validation","checker":"repository-release-gates","tool_version":"pytest 8.4.2 / npm 1.9.0 package","command_or_config":"pytest; shared-section sync; JSON Schema fixtures; 17 plugin/IDE registrations; npm pack --dry-run","start_time":"2026-10-02T18:56:30Z","end_time":"2026-10-02T18:56:38Z","duration_seconds":3.64,"result":"PASS","failure_class":"none","relevant_constraint":"final committed repository state dffaa4205890ae5a7cb77e8315bf7f3dacd5c449","key_metrics":{"pytest_passed":605,"pytest_skipped":4,"sync_targets":20,"state_fixtures":5,"plugins":17,"ide_domains":17,"npm_pack":"PASS"},"summary":"All final repository release gates passed against committed report/state content","log_path":null,"report_path":"docs/PROJECT_STATUS.md","fix_request_id":null},
+    {"run_id":"RUN-0021","pipeline_session_id":"ps_20261002_v4m_public","revision_id":"REV-0003","stage":"final_validation","checker":"canonical-handoff-release-gates","tool_version":"pytest 8.4.2 / npm 1.9.0 package","command_or_config":"pytest; shared-section sync; JSON Schema contracts; plugin registrations; npm pack --dry-run","start_time":"2026-10-02T19:00:15Z","end_time":"2026-10-02T19:00:23Z","duration_seconds":3.48,"result":"PASS","failure_class":"none","relevant_constraint":"canonical restart requirements and commit 2704b18dd7feda968af5cd89a9ee63c585855f94","key_metrics":{"pytest_passed":605,"pytest_skipped":4,"sync_targets":20,"plugins":17,"npm_pack":"PASS"},"summary":"Canonical handoff additions and REV-0003 passed all repository release gates","log_path":null,"report_path":"docs/PROJECT_STATUS.md","fix_request_id":null}
   ],
   "fix_requests": [],
   "archive_fix_requests": [],
@@ -122,14 +131,15 @@
   "history": [
     {"timestamp":"2026-10-02T18:46:23Z","agent":"input-reconstruction-orchestrator","stage":"completeness_gate","decision":"proceed","confidence":"medium","failure_class":"spec_gap","retry_strategy":"escalate","suggested_next_step":"proceed","reason":"Public architecture work may proceed; affected production stages retain exact proprietary blockers","constraint_ref":"V4M_INPUT_COMPLETENESS_REPORT"},
     {"timestamp":"2026-10-02T18:46:30Z","agent":"architecture-orchestrator","stage":"arch_signoff","decision":"proceed","confidence":"medium","failure_class":"spec_gap","retry_strategy":"escalate","suggested_next_step":"proceed","reason":"Evidence-preserving public architecture released with black-box unknowns; no production sign-off claim","constraint_ref":"REV-0002"},
-    {"timestamp":"2026-10-02T18:47:20Z","agent":"pipeline-orchestrator","stage":"signoff_or_escalate","decision":"proceed","confidence":"high","failure_class":"none","retry_strategy":"none","suggested_next_step":"proceed","reason":"Every independent public/preparatory stage ran; dependent production stages are selectively BLOCKED with exact inputs","constraint_ref":"REV-0002"}
+    {"timestamp":"2026-10-02T18:47:20Z","agent":"pipeline-orchestrator","stage":"signoff_or_escalate","decision":"proceed","confidence":"high","failure_class":"none","retry_strategy":"none","suggested_next_step":"proceed","reason":"Every independent public/preparatory stage ran; dependent production stages are selectively BLOCKED with exact inputs","constraint_ref":"REV-0002"},
+    {"timestamp":"2026-10-02T19:00:23Z","agent":"input-reconstruction-orchestrator","stage":"completeness_gate","decision":"proceed","confidence":"high","failure_class":"none","retry_strategy":"none","suggested_next_step":"proceed","reason":"Canonical inventory correction added FlexRay as explicit UNKNOWN and all checker runs now carry pipeline-session provenance","constraint_ref":"REV-0003"}
   ],
   "traceability_metrics": {
-    "total_revisions": 2,
+    "total_revisions": 3,
     "architecture_revisions": 1,
     "rtl_revisions": 0,
-    "total_checker_runs": 20,
-    "checker_results": {"PASS": 6, "FAIL": 0, "WARN": 5, "BLOCKED": 9},
+    "total_checker_runs": 21,
+    "checker_results": {"PASS": 7, "FAIL": 0, "WARN": 5, "BLOCKED": 9},
     "failures_by_class": {},
     "retries_per_checker": {
       "official-source-pin-check": 0, "json-and-schema-parser": 0, "pytest": 0,
@@ -140,7 +150,8 @@
       "scenario-sensitivity-review": 0, "dft-collateral-gate": 0,
       "openroad-and-view-gate": 0, "opensta-and-corner-gate": 0,
       "public-integration-inventory-review": 0, "official-bsp-plan-review": 0,
-      "prototype-scope-review": 0, "pytest-final": 0, "repository-release-gates": 0
+      "prototype-scope-review": 0, "pytest-final": 0, "repository-release-gates": 0,
+      "canonical-handoff-release-gates": 0
     },
     "loop_back_cycles": 0,
     "runtime_per_checker_seconds": {
@@ -154,7 +165,7 @@
       "openroad-and-view-gate": 0.01, "opensta-and-corner-gate": 0.01,
       "public-integration-inventory-review": 0.01, "official-bsp-plan-review": 0.01,
       "prototype-scope-review": 0.01, "pytest-final": 3.47,
-      "repository-release-gates": 3.64
+      "repository-release-gates": 3.64, "canonical-handoff-release-gates": 3.48
     },
     "runtime_per_stage_seconds": {
       "input_reconstruction": 0.02, "product_system_specification": 0.08,
@@ -163,14 +174,14 @@
       "formal_verification": 0.01, "cdc_rdc": 0.01, "logic_synthesis": 0.01,
       "power_area_estimation": 0.01, "dft": 0.01, "physical_design": 0.01,
       "sta": 0.01, "soc_integration": 0.01, "firmware_software_planning": 0.01,
-      "fpga_prototyping_planning": 0.01, "final_validation": 3.64
+      "fpga_prototyping_planning": 0.01, "final_validation": 7.12
     },
     "runtime_per_iteration_seconds": {},
-    "recorded_checker_runtime_seconds": 10.64,
-    "total_pipeline_runtime_seconds": 10.64,
+    "recorded_checker_runtime_seconds": 14.12,
+    "total_pipeline_runtime_seconds": 14.12,
     "pipeline_wall_start": "2026-10-02T17:33:00Z",
-    "pipeline_wall_end": "2026-10-02T18:56:38Z",
-    "total_pipeline_wall_runtime_seconds": 5018,
+    "pipeline_wall_end": "2026-10-02T19:00:23Z",
+    "total_pipeline_wall_runtime_seconds": 5243,
     "average_failure_resolution_seconds": null,
     "stages_requiring_most_retries": [],
     "most_common_failure_classes": []

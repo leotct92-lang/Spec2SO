@@ -7,10 +7,10 @@ Updated: 2026-10-02 UTC
 | Repository | `leotct92-lang/Spec2SO` |
 | Branch | `chatgpt-enterprise-pilot` |
 | Handoff baseline | `20c9b449e6eb8a23add64b970739bb9bcb9084e6` |
-| Latest verified repository commit | `dffaa4205890ae5a7cb77e8315bf7f3dacd5c449` (605 tests passed, 4 skipped; schema/plugin/package gates passed) |
-| Current/final engineering revision | REV-0002 at `3145238b53bebbc6bc0b4468722f2625766355b3` |
+| Latest verified repository commit | `2704b18dd7feda968af5cd89a9ee63c585855f94` (605 tests passed, 4 skipped; schema/plugin/package gates passed) |
+| Current/final engineering revision | REV-0003 at `2704b18dd7feda968af5cd89a9ee63c585855f94` |
 | Design state | `design_state.json`, format 2.0 |
-| Latest checker run | RUN-0020 (`repository-release-gates`, PASS) |
+| Latest checker run | RUN-0021 (`canonical-handoff-release-gates`, PASS) |
 | Pipeline session | `ps_20261002_v4m_public` |
 | Pipeline result | WARN overall; public/preparatory flow complete, dependent production gates selectively BLOCKED |
 
@@ -36,7 +36,7 @@ DFT/ATPG/MBIST collateral; power characterization; and approved verification/saf
 ## Next recommended action
 
 Acquire the controlled V4M documentation and implementation collateral, add each value through
-Stage 0 without overwriting existing evidence, create REV-0003 for the changed architecture or
+Stage 0 without overwriting existing evidence, create REV-0004 for the changed architecture or
 RTL handoff, and rerun only the affected checker chain. Do not promote the exploratory scenario
 values to production constraints.
 
@@ -44,5 +44,5 @@ values to production constraints.
 
 Checkout this branch, read this file, `docs/v4m/END_TO_END_STATUS.md`, `design_state.json`, and
 the source ledger; run `python -m pytest -q` and
-`python tools/sync_agent_sections.py --check`; then continue from REV-0002. All material
+`python tools/sync_agent_sections.py --check`; then continue from REV-0003. All material
 knowledge and exact blockers are repository-resident rather than dependent on chat history.
