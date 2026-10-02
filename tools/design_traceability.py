@@ -338,11 +338,15 @@ def calculate_metrics(state: dict[str, Any]) -> dict[str, Any]:
         for item in iterations
         if item.get("result") == "PASS"
     ]
-    domains = Counter(domain for revision in revisions for domain in revision.get("change_domain", []))
+    architecture_revisions = sum(
+        bool({"architecture", "microarchitecture"} & set(revision.get("change_domain", [])))
+        for revision in revisions
+    )
+    rtl_revisions = sum("rtl" in revision.get("change_domain", []) for revision in revisions)
     return {
         "total_revisions": len(revisions),
-        "architecture_revisions": domains["architecture"] + domains["microarchitecture"],
-        "rtl_revisions": domains["rtl"],
+        "architecture_revisions": architecture_revisions,
+        "rtl_revisions": rtl_revisions,
         "total_checker_runs": len(runs),
         "checker_results": {key: results.get(key, 0) for key in sorted(RUN_RESULTS)},
         "failures_by_class": dict(sorted(failures.items())),

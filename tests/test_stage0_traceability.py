@@ -199,6 +199,18 @@ def test_failure_fix_revision_rerun_and_iteration_chain(trace):
     assert trace.calculate_metrics(state)["loop_back_cycles"] == 1
 
 
+def test_architecture_revision_is_counted_once_for_multi_domain_change(trace):
+    state = {
+        "revisions": [
+            {
+                "revision_id": "REV-0001",
+                "change_domain": ["architecture", "microarchitecture"],
+            }
+        ]
+    }
+    assert trace.calculate_metrics(state)["architecture_revisions"] == 1
+
+
 def test_checker_requires_known_revision(trace):
     with pytest.raises(trace.TraceabilityError, match="unknown revision"):
         trace.record_checker_run({}, run("RUN-0001", "REV-9999", "BLOCKED"))
