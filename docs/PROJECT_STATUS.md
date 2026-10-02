@@ -7,7 +7,7 @@ Updated: 2026-10-02 UTC
 | Repository | `leotct92-lang/Spec2SO` |
 | Branch | `chatgpt-enterprise-pilot` |
 | Handoff baseline | `20c9b449e6eb8a23add64b970739bb9bcb9084e6` |
-| Latest verified framework commit | `3d2cdcd` (605 tests passed, 4 skipped) |
+| Latest verified repository commit | `dffaa4205890ae5a7cb77e8315bf7f3dacd5c449` (605 tests passed, 4 skipped; schema/plugin/package gates passed) |
 | Current/final engineering revision | REV-0002 at `3145238b53bebbc6bc0b4468722f2625766355b3` |
 | Design state | `design_state.json`, format 2.0 |
 | Pipeline result | WARN overall; public/preparatory flow complete, dependent production gates selectively BLOCKED |

@@ -40,14 +40,14 @@ gate ran, and each product implementation stage that needs unavailable inputs is
 7. Architecture revisions: 1.
 8. RTL revisions: 0; no product RTL was ethically or technically implementable.
 9. Total engineering revisions: 2.
-10. Total checker runs: 19.
-11. Checker results: 5 PASS, 0 FAIL, 5 WARN, 9 BLOCKED.
+10. Total checker runs: 20.
+11. Checker results: 6 PASS, 0 FAIL, 5 WARN, 9 BLOCKED.
 12. Most common failure classes: none; no run returned FAIL.
 13. Failure → fixing revision mappings: none; blocked gates did not fabricate failures/fixes.
 14. Loop-back cycles: 0; two Stage 0 feedback requests were dispositioned BLOCKED without a design revision.
 15. Runtime per iteration: none.
 16. Runtime per stage: recorded in `docs/revisions/PIPELINE_EXECUTION_SUMMARY.md`.
-17. Total recorded checker runtime: 7.00 s; observed pipeline wall window: 4,620 s.
+17. Total recorded checker runtime: 10.64 s; observed pipeline wall window: 5,018 s.
 18. Final engineering revision: REV-0002.
 19. Final engineering Git SHA: `3145238b53bebbc6bc0b4468722f2625766355b3`.
 20. Final status matrix: above.
@@ -60,7 +60,7 @@ gate ran, and each product implementation stage that needs unavailable inputs is
 
 - Exact input provenance lives in `design_state.json`, `V4M_SOURCE_LEDGER.md`, and the field
   inventory. Estimates never replace official facts.
-- REV-0001 and REV-0002 are recoverable Git commits. All 19 checker records reference REV-0002.
+- REV-0001 and REV-0002 are recoverable Git commits. All 20 checker records reference REV-0002.
 - There were no failed checker runs, so `fix_requests[]` and `iteration_history[]` correctly
   remain empty. The reusable failure-chain tests pass.
 - Direct Renesas product-page/general web retrieval returned HTTP 403. The final sweep used
