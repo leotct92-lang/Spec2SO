@@ -1,0 +1,31 @@
+{
+  "schema_version": "2.0",
+  "product": {"manufacturer": "Renesas Electronics", "name": "R-Car V4M", "soc_id": "R8A779H0", "reference_board": "Gray Hawk"},
+  "retrieval_date": "2026-10-02",
+  "status": "WARN",
+  "facts": {
+    "cpu": {
+      "architecture": "Arm Cortex-A76",
+      "core_count": {"value": 4, "unit": "cores", "evidence": "OFFICIAL_DISCLOSED", "confidence": "HIGH", "usage": "HARD_CONSTRAINT", "source": "S1", "uncertainty": "public Linux topology; silicon fusing not characterized"},
+      "public_bsp_opps_mhz": {"value": [500, 1000], "unit": "MHz", "evidence": "OFFICIAL_DISCLOSED", "confidence": "HIGH", "usage": "SOFT_CONSTRAINT", "source": "S1", "uncertainty": "BSP operating points, not proof of product maximum"},
+      "public_bsp_opp_voltage_v": {"value": 0.825, "unit": "V", "evidence": "OFFICIAL_DISCLOSED", "confidence": "HIGH", "usage": "SOFT_CONSTRAINT", "source": "S1", "uncertainty": "CPU OPP context only"}
+    },
+    "cache": {
+      "l1_i_kib_per_core": {"value": 64, "unit": "KiB", "evidence": "OFFICIAL_DISCLOSED", "confidence": "HIGH", "usage": "HARD_CONSTRAINT", "source": "S4"},
+      "l1_d_kib_per_core": {"value": 64, "unit": "KiB", "evidence": "OFFICIAL_DISCLOSED", "confidence": "HIGH", "usage": "HARD_CONSTRAINT", "source": "S4"},
+      "l2_kib_per_core": {"value": 256, "unit": "KiB", "evidence": "OFFICIAL_DISCLOSED", "confidence": "HIGH", "usage": "HARD_CONSTRAINT", "source": "S4"},
+      "l3_kib_per_cluster": {"value": 512, "unit": "KiB", "evidence": "OFFICIAL_DISCLOSED", "confidence": "HIGH", "usage": "HARD_CONSTRAINT", "source": "S4"}
+    },
+    "realtime_cpu": {"family_existence": "Cortex-R52-class thermal domain", "core_count": null, "lockstep": null, "frequency_mhz": null, "evidence": "UNKNOWN", "sources": ["S1"]},
+    "accelerators": {"imp_instances": 2, "cve_instances": 4, "cnn_instances": 1, "vdsp_domains": 2, "unit": "software-visible instances", "tops": null, "precision": null, "evidence": "OFFICIAL_DISCLOSED", "confidence": "HIGH", "usage": "SOFT_CONSTRAINT", "sources": ["S7"], "uncertainty": "exposure does not establish enabled silicon or throughput"},
+    "gpu": {"public_driver_name": "GSX", "execution_resources": null, "evidence": "OFFICIAL_DISCLOSED", "sources": ["S1", "S3"]},
+    "camera": {"csi2_receivers": 2, "vin_instances": 16, "isp_instances": 2, "grayhawk_serializer_links": 8, "unit": "instances", "pixel_throughput": null, "evidence": "OFFICIAL_DISCLOSED", "confidence": "HIGH", "usage": "SOFT_CONSTRAINT", "sources": ["S1", "S2"], "uncertainty": "board links and controller nodes do not establish simultaneous throughput"},
+    "display": {"display_units": 1, "vsp_instances": 1, "mipi_dsi_encoders": 1, "evidence": "OFFICIAL_DISCLOSED", "sources": ["S1", "S2"]},
+    "interfaces": {"ethernet_controllers": 3, "can_fd_channels": 4, "pcie_controllers": 1, "pcie_modes": ["root_complex", "endpoint"], "emmc_interfaces": 1, "unit": "instances/channels", "evidence": "OFFICIAL_DISCLOSED", "confidence": "HIGH", "usage": "SOFT_CONSTRAINT", "sources": ["S1", "S2"], "uncertainty": "exact rates, lanes and package availability unresolved"},
+    "board_memory": {"estimated_fitted_gib": 8.0, "linux_nonsecure_gib": 7.875, "secure_reserved_mib": 128, "scope": "Gray Hawk board, not controller maximum", "evidence": "DERIVED_ESTIMATE", "confidence": "MEDIUM", "usage": "SOFT_CONSTRAINT", "derivation": "7.875 GiB non-secure + 128 MiB secure", "lower_bound_gib": 8.0, "upper_bound_gib": 8.0, "sources": ["S2"]},
+    "security_software": {"arm_trusted_firmware": true, "optee": true, "mbedtls_integration": true, "production_secure_boot": null, "hsm": null, "evidence": "OFFICIAL_DISCLOSED", "sources": ["S1", "S5", "S6"]},
+    "software": {"linux": true, "yocto_branch": "scarthgap", "sdk_target": "aarch64-poky-linux", "opencv_sdk": true, "evidence": "OFFICIAL_DISCLOSED", "sources": ["S3", "S5"]}
+  },
+  "unknown_or_assumed": ["peak_tops", "ai_precision", "product_max_cpu_frequency", "r52_count_lockstep_frequency", "sram_total", "dram_type_channels_rate_bandwidth_ecc", "internal_interconnect", "isp_pixel_throughput", "video_codec_limits", "usb_and_lin_inventory", "pll_dvfs_tables", "soc_power", "subsystem_power", "tdp", "thermal_limits", "process_foundry", "die_dimensions_area", "package_dimensions", "safety_certification_scope", "secure_boot_hsm_root_of_trust", "autosar_hypervisor_products", "production_physical_timing_dft_verification_constraints"],
+  "source_ledger": "V4M_SOURCE_LEDGER.md"
+}
