@@ -13,6 +13,7 @@ Updated: 2026-10-02 UTC
 | Latest checker run | RUN-0021 (`canonical-handoff-release-gates`, PASS) |
 | Pipeline session | `ps_20261002_v4m_public` |
 | Pipeline result | WARN overall; public/preparatory flow complete, dependent production gates selectively BLOCKED |
+| Pull request | Pending: branch is pushed, but this environment's `GH_TOKEN` is invalid; use the compare link below |
 
 ## Completed
 
@@ -35,10 +36,12 @@ DFT/ATPG/MBIST collateral; power characterization; and approved verification/saf
 
 ## Next recommended action
 
-Acquire the controlled V4M documentation and implementation collateral, add each value through
-Stage 0 without overwriting existing evidence, create REV-0004 for the changed architecture or
-RTL handoff, and rerun only the affected checker chain. Do not promote the exploratory scenario
-values to production constraints.
+Open the prepared comparison at
+`https://github.com/leotct92-lang/Spec2SO/compare/master...chatgpt-enterprise-pilot?expand=1`
+when authenticated, then acquire the controlled V4M documentation and implementation
+collateral. Add each new value through Stage 0 without overwriting existing evidence, create
+REV-0004 for changed architecture or RTL handoff, and rerun only the affected checker chain.
+Do not promote the exploratory scenario values to production constraints.
 
 ## Continuation procedure
 
